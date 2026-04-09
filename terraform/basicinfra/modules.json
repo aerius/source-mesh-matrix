@@ -1,0 +1,7 @@
+[
+  {
+    "url": "git@github.com:aerius/Cloud-infra-modules.git",
+    "version": "v1.1",
+    "checkout_path": "basicinfra"
+  }
+]
