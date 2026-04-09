@@ -1,0 +1,15 @@
+# Ignore generated theme
+generated
+
+# Ignore compose binary
+compose
+
+# Ignore all jar files
+*.jar
+
+# Ignore generated Dockerfiles (from templates found in common)
+common/api/Dockerfile
+
+# Ignore source folders
+
+# Ignore generated script files
