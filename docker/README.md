@@ -17,7 +17,7 @@ cd source
 mvn clean package -Pdeploy -DskipTest
 
 # Go to Docker directory
-$ cd ../docker
+cd ../docker
 
 # Set the CI/CD scripts directory (if not set)
 export CICD_SCRIPTS_DIR=/examle/folder/cicd-scripts
