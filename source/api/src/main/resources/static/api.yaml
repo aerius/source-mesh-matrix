@@ -47,18 +47,13 @@ paths:
           description: Query accepted (for asynchronous) processing)
           headers:
             Location:
-              description: The URL to poll for the current status of the asynchronous query
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/LocationHeader'
             Retry-After:
-              description: The suggested polling interval in seconds
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MetricsQueryStatusResponse'
+              $ref: '#/components/headers/RetryAfterHeader'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MetricsQueryStatusResponse'
         '400':
           description: Invalid request
         '500':
@@ -78,6 +73,11 @@ paths:
       responses:
         '200':
           description: Query status
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+            Retry-After:
+              $ref: '#/components/headers/RetryAfterHeader'
           content:
             application/json:
               schema:
@@ -112,8 +112,19 @@ paths:
 
 
 components:
-  schemas:
+  headers:
+    LocationHeader:
+      description: The URL to poll for the current status of the asynchronous query
+      schema:
+        type: string
+        format: uri
 
+    RetryAfterHeader:
+      description: The suggested polling interval in seconds
+      schema:
+        type: integer
+
+  schemas:
     Point:
       type: object
       additionalProperties: false
