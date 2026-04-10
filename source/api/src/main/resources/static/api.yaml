@@ -50,10 +50,10 @@ paths:
               $ref: '#/components/headers/LocationHeader'
             Retry-After:
               $ref: '#/components/headers/RetryAfterHeader'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/MetricsQueryStatusResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsQueryStatusResponse'
         '400':
           description: Invalid request
         '500':
