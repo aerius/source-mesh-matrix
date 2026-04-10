@@ -24,7 +24,6 @@
     <groupId>nl.aerius</groupId>
     <artifactId>source-mesh-matrix-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>smm-api</artifactId>
   <name>source-mesh-matrix API</name>
@@ -47,9 +46,8 @@
 
     <!-- Dependencies for generated code -->
     <dependency>
-      <groupId>io.swagger.parser.v3</groupId>
-      <artifactId>swagger-parser</artifactId>
-      <version>2.1.22</version>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>org.openapitools</groupId>
