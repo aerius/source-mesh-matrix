@@ -1,0 +1,7 @@
+### BASE: spring-boot-base
+
+# Set defaults
+ENV OTEL_SERVICE_NAME='aerius-smm-api'
+
+# Start application
+CMD java -server $JAVA_OPTIONS -jar /app.jar

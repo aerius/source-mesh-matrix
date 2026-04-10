@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright the State of the Netherlands
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>nl.aerius</groupId>
+    <artifactId>source-mesh-matrix-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>smm-api</artifactId>
+  <name>source-mesh-matrix API</name>
+  <description>API service for source-mesh-matrix</description>
+
+  <dependencies>
+    <!-- Spring boot basic dependencies -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Dependencies for generated code -->
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+    </dependency>
+
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <configuration>
+          <skip>${maven.main.skip}</skip>
+          <!-- Type of code to generate -->
+          <generatorName>spring</generatorName>
+          <!-- Location where generated code should end up -->
+          <output>${project.build.directory}/openapi/</output>
+          <!-- Package for the api side of things -->
+          <apiPackage>nl.aerius.smm.api.generated.api</apiPackage>
+          <!-- Package for the model (or domain) side of things -->
+          <modelPackage>nl.aerius.smm.api.generated.model</modelPackage>
+          <!--
+            Prevent generating too much by only specifying one file.
+            The ApiUtil is fairly harmless and is actually used in the delegate pattern.
+            Reason to not want all the default generated files: we'd need more dependencies.
+          -->
+          <modelNamePrefix>Rest</modelNamePrefix>
+          <supportingFilesToGenerate>
+            ApiUtil.java
+          </supportingFilesToGenerate>
+          <configOptions>
+            <!-- Not sure yet if we're using dates, but if so we'd better stick to plain java -->
+            <dateLibrary>java8</dateLibrary>
+            <!--
+              Using delegate pattern for easy implementation with spring boot.
+              Only have to implement an interface and annotate it with the correct annotation.
+            -->
+            <delegatePattern>true</delegatePattern>
+            <!-- Ensure spring boot 3 dependencies are used (jakarta instead of javax for one thing) -->
+            <useSpringBoot3>true</useSpringBoot3>
+
+            <!-- Ensure generated models implement serializable -->
+            <serializableModel>true</serializableModel>
+          </configOptions>
+          <globalProperties>
+            <!--
+              Ensure everything is generated properly
+              With true, which is default, only objects deemed necessary for form model are generated.
+              As we have some cross references to the common api, that doesn't really work for us.
+            -->
+            <skipFormModel>false</skipFormModel>
+          </globalProperties>
+          <additionalProperties>removeEnumValuePrefix=false</additionalProperties>
+        </configuration>
+        <executions>
+          <execution>
+            <id>api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <!-- Location of our openapi specification file -->
+              <inputSpec>${project.basedir}/src/main/resources/static/api.yaml</inputSpec>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

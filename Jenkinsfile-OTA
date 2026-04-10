@@ -1,0 +1,42 @@
+@Library('cicd-scripts')
+
+def PIPELINE_AGENT_LABEL    = 'Build-Large'
+def DOCKER_MAVEN_IMAGE      = 'maven:3-eclipse-temurin-21'
+
+cicdPipeline(
+  agentLabel      : PIPELINE_AGENT_LABEL,
+
+  environment : [
+    SERVICE_THEME : "${env.SERVICE_THEME ?: 'NL'}"
+  ],
+
+  deployFlags : [:],
+  ) {
+
+  cicdStage('Maven') {
+    docker.image(DOCKER_MAVEN_IMAGE).inside {
+
+      sh '''
+        mvn -f source/pom.xml clean versions:set -DnewVersion="${AERIUS_IMAGE_TAG}" -Pdeploy --no-transfer-progress
+        mvn -f source/pom.xml clean package -Pdeploy -DskipTests -DfailIfNoTests=true --no-transfer-progress
+      '''
+
+    }
+  }
+
+  cicdStage('Docker Images') {
+    withCredentials([
+      string(credentialsId: 'HTTPS_DBDATA_USERNAME', variable: 'HTTPS_DATA_USERNAME'),
+      string(credentialsId: 'HTTPS_DBDATA_PASSWORD', variable: 'HTTPS_DATA_PASSWORD')
+    ]) {
+
+      sh '''
+        export AERIUS_GITHASH="$(git log -1 --pretty=format:%h)"
+
+        cd docker
+        "${CICD_SCRIPTS_DIR}"/docker/images_v1.0.sh
+      '''
+
+    }
+  }
+}
