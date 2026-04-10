@@ -17,9 +17,9 @@
 openapi: 3.1.0
 
 info:
-  title: Source Mesh Matrix API
+  title: Source Mesh Matrix Public API
   description: |
-    TODO
+    Generic public service to query 'SRM' (source receptor matrix) values.
   license:
     name: Apache License, version 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
@@ -31,14 +31,258 @@ servers:
 
 tags: []
 
-paths: {}
+paths:
+  /metrics/query:
+    post:
+      summary: Start metrics query
+      operationId: createMetricsQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsQueryRequest'
+      responses:
+        '202':
+          description: Query accepted (for asynchronous) processing)
+          headers:
+            Location:
+              description: The URL to poll for the current status of the asynchronous query
+              schema:
+                type: string
+                format: uri
+            Retry-After:
+              description: The suggested polling interval in seconds
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsQueryStatusResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+
+  /metrics/query/status/{queryId}:
+    get:
+      summary: Get metrics query status
+      operationId: getMetricsQueryStatus
+      parameters:
+        - name: queryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uri
+      responses:
+        '200':
+          description: Query status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsQueryStatusResponse'
+        '404':
+          description: Query not found
+        '500':
+          description: Internal server error
+
+  /metrics/query/{queryId}:
+    get:
+      summary: Get metrics query result
+      operationId: getMetricsQueryResult
+      parameters:
+        - name: queryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uri
+      responses:
+        '200':
+          description: Query result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricQueryResultResponse'
+        '404':
+          description: Query not found
+        '500':
+          description: Internal server error
+
 
 components:
+  schemas:
 
-  responses:
-    ClientError:
-      description: |
-        Error in input
-      content: { }
+    Point:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - y
+      examples:
+        - x: 100
+          y: 200
 
-  schemas: {}
+    Receptor:
+      type: integer
+      description: Receptor ID
+      examples:
+        - 100001
+
+    Substance:
+      type: string
+      description: Substance
+      examples:
+        - "NO2"
+        - "NH3"
+
+    MetricsQueryRequest:
+      type: object
+      properties:
+        calculation_version:
+          description: Filter by calculation version
+          type: string
+        substances:
+          description: Filter by substance(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/Substance"
+        source_characteristics:
+          description: Filter by source characteristics
+          type: object
+          additionalProperties: false
+          properties:
+            height:
+              description: Filter by source height
+              type: number
+            heat_content:
+              description: Filter by heat content
+              type: number
+            spread:
+              description: Filter by spread
+              type: number
+            emission_diurnal_variation:
+              description: Filter by emission diurnal variation ID
+              type: integer
+              minimum: 0
+              maximum: 5
+            particle_size_distribution:
+              description: Filter by particle size distribution ID
+              type: integer
+          examples:
+            - height: 1.0
+              heat_content: 10.5
+              spread: 1.0
+              emission_diurnal_variation: 2
+              particle_size_distribution: 0
+        receptors:
+          description: Filter by receptor ID(s)
+          type: array
+          items:
+            $ref: '#/components/schemas/Receptor'
+        source_points:
+          description: List of exact source coordinate points.
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Point'
+      additionalProperties: false
+      examples:
+        - calculation_version: "2025.2"
+          substances: ["NO2", "NH3"]
+          source_characteristics:
+            height: 1.0
+            heat_content: 10.5
+            spread: 1.0
+            emission_diurnal_variation: 2
+            particle_size_distribution: 0
+          receptors: [100001, 100002]
+          source_points:
+            - x: 100
+              y: 200
+            - x: 150
+              y: 250
+
+    MetricsQueryStatusResponse:
+      type: object
+      properties:
+        status:
+          description: The current processing status of the query
+          type: string
+          enum:
+            - Processing
+            - Completed
+        statusUrl:
+          description: The URL to poll for the current status of the asynchronous query
+          type: string
+          format: uri
+      required:
+        - status
+        - statusUrl
+      examples:
+        - status: "Processing"
+          statusUrl: "/api/v1/metrics/query/status/123"
+        - status: "Completed"
+          statusUrl: "/api/v1/metrics/query/status/123"
+
+    MetricQueryResultResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        query:
+          $ref: '#/components/schemas/MetricsQueryRequest'
+        records:
+          type: array
+          description: Matching metric values for the submitted query
+          items:
+            $ref: '#/components/schemas/MetricResultRecord'
+      required:
+        - query
+        - records
+      examples:
+        - query:
+            calculation_version: "2025.2"
+            substances: ["NO2"]
+            receptors: [100001]
+            source_points:
+              - x: 100
+                y: 200
+          records:
+            - source_point:
+                x: 100
+                y: 200
+              receptor: 100001
+              substance: "NO2"
+              value: 12.34
+
+    MetricResultRecord:
+      type: object
+      additionalProperties: false
+      properties:
+        source_point:
+          $ref: '#/components/schemas/Point'
+        receptor:
+          $ref: '#/components/schemas/Receptor'
+        substance:
+          $ref: '#/components/schemas/Substance'
+        value:
+          type: number
+          format: float
+          description: Calculated metric value
+      required:
+        - source_point
+        - receptor
+        - substance
+        - value
+      examples:
+        - source_point:
+            x: 100
+            y: 200
+          receptor: 100001
+          substance: "NO2"
+          value: 12.34
