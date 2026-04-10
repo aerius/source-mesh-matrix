@@ -143,6 +143,8 @@ components:
 
     MetricsQueryRequest:
       type: object
+      description: >
+        Parameters for submitting a metrics query.
       properties:
         calculation_version:
           description: Filter by calculation version
@@ -210,6 +212,8 @@ components:
 
     MetricsQueryStatusResponse:
       type: object
+      description: >
+        Represents the current status of an asynchronous metrics query.
       properties:
         status:
           description: The current processing status of the query
@@ -232,6 +236,10 @@ components:
 
     MetricQueryResultResponse:
       type: object
+      description: >
+        Query result containing the original query and the resulting metric records. 
+        The records only include fields that vary per result.
+        Fields provided in the query are not repeated in each record to avoid redundancy.
       additionalProperties: false
       properties:
         query:
@@ -261,6 +269,8 @@ components:
               value: 12.34
 
     MetricResultRecord:
+      description: >
+        Represents a single metric result.
       type: object
       additionalProperties: false
       properties:
