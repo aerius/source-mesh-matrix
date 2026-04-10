@@ -116,6 +116,7 @@ components:
 
     Point:
       type: object
+      additionalProperties: false
       properties:
         x:
           type: integer
@@ -145,6 +146,7 @@ components:
       type: object
       description: >
         Parameters for submitting a metrics query.
+      additionalProperties: false
       properties:
         calculation_version:
           description: Filter by calculation version
@@ -155,8 +157,8 @@ components:
           items:
             $ref: "#/components/schemas/Substance"
         source_characteristics:
-          description: Filter by source characteristics
           type: object
+          description: Filter by source characteristics
           additionalProperties: false
           properties:
             height:
@@ -193,7 +195,6 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Point'
-      additionalProperties: false
       examples:
         - calculation_version: "2025.2"
           substances: ["NO2", "NH3"]
@@ -214,6 +215,7 @@ components:
       type: object
       description: >
         Represents the current status of an asynchronous metrics query.
+      additionalProperties: false
       properties:
         status:
           description: The current processing status of the query
@@ -269,9 +271,9 @@ components:
               value: 12.34
 
     MetricResultRecord:
+      type: object
       description: >
         Represents a single metric result.
-      type: object
       additionalProperties: false
       properties:
         source_point:
