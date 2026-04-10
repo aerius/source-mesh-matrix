@@ -1,13 +1,27 @@
 # API
-
 The API is a Java Spring Boot application.
 
-## Running the API
+## Maven
+The project uses Maven for building, running, and generating code.
 
-### Running the API during development
+### Common commands
 
-Running the API during development can be done using maven:
-
-```
+Run the API locally
+```bash
 mvn spring-boot:run
+```
+
+Generate API code from the OpenAPI specification. The generated code is placed in `target/openapi`
+```bash
+mvn generate-resources
+```
+
+Clean and build the project (also triggers code generation)
+```bash
+mvn clean install
+```
+
+Run tests
+```bash
+mvn test
 ```
