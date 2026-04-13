@@ -76,7 +76,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uri
+            format: uuid
       responses:
         '200':
           description: Query status
@@ -104,7 +104,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uri
+            format: uuid
       responses:
         '200':
           description: Query result
