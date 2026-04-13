@@ -19,7 +19,7 @@ openapi: 3.1.0
 info:
   title: Source Mesh Matrix Public API
   description: |
-    Generic public service to query 'SRM' (source receptor matrix) values.
+    Generic public service to query 'SMM' (source mesh matrix) values.
   license:
     name: Apache License, version 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
@@ -39,7 +39,7 @@ servers:
 tags: []
 
 paths:
-  /metrics/query:
+  /matrix/query:
     post:
       summary: Start metrics query
       operationId: createMetricsQuery
@@ -51,12 +51,10 @@ paths:
               $ref: '#/components/schemas/MetricsQueryRequest'
       responses:
         '202':
-          description: Query accepted (for asynchronous) processing)
+          description: Query accepted (for asynchronous processing)
           headers:
             Location:
               $ref: '#/components/headers/LocationHeader'
-            Retry-After:
-              $ref: '#/components/headers/RetryAfterHeader'
           content:
             application/json:
               schema:
@@ -66,7 +64,7 @@ paths:
         '500':
           description: Internal server error
 
-  /metrics/query/status/{queryId}:
+  /matrix/query/status/{queryId}:
     get:
       summary: Get metrics query status
       operationId: getMetricsQueryStatus
@@ -94,7 +92,7 @@ paths:
         '500':
           description: Internal server error
 
-  /metrics/query/{queryId}:
+  /matrix/query/{queryId}:
     get:
       summary: Get metrics query result
       operationId: getMetricsQueryResult
@@ -157,7 +155,7 @@ components:
       type: string
       description: Substance
       examples:
-        - "NO2"
+        - "NOx"
         - "NH3"
 
     MetricsQueryRequest:
@@ -191,17 +189,11 @@ components:
             emission_diurnal_variation:
               description: Filter by emission diurnal variation ID
               type: integer
-              minimum: 0
-              maximum: 5
-            particle_size_distribution:
-              description: Filter by particle size distribution ID
-              type: integer
           required:
             - height
             - heat_content
             - spread
             - emission_diurnal_variation
-            - particle_size_distribution
           examples:
             - height: 1.0
               heat_content: 10.5
