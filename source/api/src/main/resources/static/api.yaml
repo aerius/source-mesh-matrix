@@ -196,6 +196,12 @@ components:
             particle_size_distribution:
               description: Filter by particle size distribution ID
               type: integer
+          required:
+            - height
+            - heat_content
+            - spread
+            - emission_diurnal_variation
+            - particle_size_distribution
           examples:
             - height: 1.0
               heat_content: 10.5
@@ -213,6 +219,12 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Point'
+      required:
+        - calculation_version
+        - substances
+        - source_characteristics
+        - receptors
+        - source_points
       examples:
         - calculation_version: "2025.2"
           substances: ["NO2", "NH3"]
