@@ -41,14 +41,14 @@ tags: []
 paths:
   /matrix/query:
     post:
-      summary: Start metrics query
-      operationId: createMetricsQuery
+      summary: Start matrix query
+      operationId: createMatrixQuery
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MetricsQueryRequest'
+              $ref: '#/components/schemas/MatrixQueryRequest'
       responses:
         '202':
           description: Query accepted (for asynchronous processing)
@@ -58,7 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MetricsQueryStatusResponse'
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
         '400':
           description: Invalid request
         '500':
@@ -66,8 +66,8 @@ paths:
 
   /matrix/query/status/{queryId}:
     get:
-      summary: Get metrics query status
-      operationId: getMetricsQueryStatus
+      summary: Get matrix query status
+      operationId: getMatrixQueryStatus
       parameters:
         - name: queryId
           in: path
@@ -86,7 +86,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MetricsQueryStatusResponse'
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
         '404':
           description: Query not found
         '500':
@@ -94,8 +94,8 @@ paths:
 
   /matrix/query/{queryId}:
     get:
-      summary: Get metrics query result
-      operationId: getMetricsQueryResult
+      summary: Get matrix query result
+      operationId: getMatrixQueryResult
       parameters:
         - name: queryId
           in: path
@@ -109,7 +109,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MetricQueryResultResponse'
+                $ref: '#/components/schemas/MatrixQueryResultResponse'
         '404':
           description: Query not found
         '500':
@@ -158,10 +158,10 @@ components:
         - "NOx"
         - "NH3"
 
-    MetricsQueryRequest:
+    MatrixQueryRequest:
       type: object
       description: >
-        Parameters for submitting a metrics query.
+        Parameters for submitting a matrix query.
       additionalProperties: false
       properties:
         calculation_version:
@@ -233,10 +233,10 @@ components:
             - x: 150
               y: 250
 
-    MetricsQueryStatusResponse:
+    MatrixQueryStatusResponse:
       type: object
       description: >
-        Represents the current status of an asynchronous metrics query.
+        Represents the current status of an asynchronous matrix query.
       additionalProperties: false
       properties:
         status:
@@ -254,25 +254,25 @@ components:
         - statusUrl
       examples:
         - status: "Processing"
-          statusUrl: "/api/v1/metrics/query/status/123"
+          statusUrl: "/api/v1/matrix/query/status/123"
         - status: "Completed"
-          statusUrl: "/api/v1/metrics/query/status/123"
+          statusUrl: "/api/v1/matrix/query/status/123"
 
-    MetricQueryResultResponse:
+    MatrixQueryResultResponse:
       type: object
       description: >
-        Query result containing the original query and the resulting metric records. 
+        Query result containing the original query and the resulting matrix records.
         The records only include fields that vary per result.
         Fields provided in the query are not repeated in each record to avoid redundancy.
       additionalProperties: false
       properties:
         query:
-          $ref: '#/components/schemas/MetricsQueryRequest'
+          $ref: '#/components/schemas/MatrixQueryRequest'
         records:
           type: array
-          description: Matching metric values for the submitted query
+          description: Matching matrix values for the submitted query
           items:
-            $ref: '#/components/schemas/MetricResultRecord'
+            $ref: '#/components/schemas/MatrixResultRecord'
       required:
         - query
         - records
@@ -292,10 +292,10 @@ components:
               substance: "NO2"
               value: 12.34
 
-    MetricResultRecord:
+    MatrixResultRecord:
       type: object
       description: >
-        Represents a single metric result.
+        Represents a single matrix result row.
       additionalProperties: false
       properties:
         source_point:
@@ -307,7 +307,7 @@ components:
         value:
           type: number
           format: float
-          description: Calculated metric value
+          description: Calculated matrix value
       required:
         - source_point
         - receptor
