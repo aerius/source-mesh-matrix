@@ -26,15 +26,10 @@ info:
   version: 0.0.1
 
 servers:
+  - url: /api/v1
+    description: Deployment server
   - url: http://localhost:8080/api/v1
     description: Development server
-  - url: https://{host}/api/v1
-    description: Deployment server
-    variables:
-      host:
-        default: smm-dev.aerius.nl
-        enum:
-          - smm-dev.aerius.nl
 
 tags: []
 
