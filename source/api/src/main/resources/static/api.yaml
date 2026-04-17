@@ -54,10 +54,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '429':
+          description: Too Many Requests
+          headers:
+            Retry-After:
+              description: The suggested polling interval in seconds
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
         '400':
-          description: Invalid request
+          $ref: '#/components/responses/InvalidRequestResponse'
         '500':
-          description: Internal server error
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /matrix/query/status/{queryId}:
     get:
@@ -82,10 +93,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestResponse'
         '404':
-          description: Query not found
+          $ref: '#/components/responses/ResourceNotFoundResponse'
         '500':
-          description: Internal server error
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /matrix/query/{queryId}:
     get:
@@ -105,10 +118,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryResultResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestResponse'
         '404':
-          description: Query not found
+          $ref: '#/components/responses/ResourceNotFoundResponse'
         '500':
-          description: Internal server error
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
 
 components:
@@ -123,6 +138,29 @@ components:
       description: The suggested polling interval in seconds
       schema:
         type: integer
+
+
+  responses:
+    InvalidRequestResponse:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+
+    ResourceNotFoundResponse:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+
+    InternalServerErrorResponse:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
 
   schemas:
     Point:
@@ -152,6 +190,17 @@ components:
       examples:
         - "NOx"
         - "NH3"
+
+    ErrorMessage:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: Resource not found
+        error:
+          type: string
 
     MatrixQueryRequest:
       type: object
@@ -240,6 +289,8 @@ components:
           enum:
             - Processing
             - Completed
+            - Rejected
+            - Failed
         statusUrl:
           description: The URL to poll for the current status of the asynchronous query
           type: string
