@@ -65,10 +65,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
-        '400':
-          $ref: '#/components/responses/InvalidRequestResponse'
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
 
   /matrix/query/status/{queryId}:
     get:
@@ -93,12 +91,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryStatusResponse'
-        '400':
-          $ref: '#/components/responses/InvalidRequestResponse'
-        '404':
-          $ref: '#/components/responses/ResourceNotFoundResponse'
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
 
   /matrix/query/{queryId}:
     get:
@@ -118,12 +112,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryResultResponse'
-        '400':
-          $ref: '#/components/responses/InvalidRequestResponse'
         '404':
-          $ref: '#/components/responses/ResourceNotFoundResponse'
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
+          description: Task not found
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          description: Task not ready yet
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
 
 
 components:
@@ -141,22 +137,8 @@ components:
 
 
   responses:
-    InvalidRequestResponse:
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-
-    ResourceNotFoundResponse:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-
-    InternalServerErrorResponse:
-      description: Internal Server Error
+    ErrorResponse:
+      description: Error
       content:
         application/json:
           schema:
@@ -198,7 +180,6 @@ components:
       properties:
         title:
           type: string
-          example: Resource not found
         error:
           type: string
 
@@ -219,6 +200,7 @@ components:
         source_characteristics:
           type: object
           description: Filter by source characteristics
+          title: SourceCharacteristics
           additionalProperties: false
           properties:
             height:
@@ -263,7 +245,7 @@ components:
         - source_points
       examples:
         - calculation_version: "2025.2"
-          substances: ["NO2", "NH3"]
+          substances: ["NOx", "NH3"]
           source_characteristics:
             height: 1.0
             heat_content: 10.5
@@ -325,7 +307,7 @@ components:
       examples:
         - query:
             calculation_version: "2025.2"
-            substances: ["NO2"]
+            substances: ["NOx"]
             receptors: [100001]
             source_points:
               - x: 100
@@ -335,7 +317,7 @@ components:
                 x: 100
                 y: 200
               receptor: 100001
-              substance: "NO2"
+              substance: "NOx"
               value: 12.34
 
     MatrixResultRecord:
@@ -364,5 +346,5 @@ components:
             x: 100
             y: 200
           receptor: 100001
-          substance: "NO2"
+          substance: "NOx"
           value: 12.34
