@@ -31,13 +31,19 @@ servers:
   - url: http://localhost:8080/api/v1
     description: Development server
 
-tags: []
+tags:
+  - name: query
+    description: Query operations for retrieving matrix values
+  - name: catalog
+    description: Endpoints that return valid query values
 
 paths:
   /matrix/query:
     post:
       summary: Start matrix query
       operationId: createMatrixQuery
+      tags:
+        - query
       requestBody:
         required: true
         content:
@@ -72,6 +78,8 @@ paths:
     get:
       summary: Get matrix query status
       operationId: getMatrixQueryStatus
+      tags:
+        - query
       parameters:
         - name: queryId
           in: path
@@ -98,6 +106,8 @@ paths:
     get:
       summary: Get matrix query result
       operationId: getMatrixQueryResult
+      tags:
+        - query
       parameters:
         - name: queryId
           in: path
@@ -118,6 +128,38 @@ paths:
         '409':
           description: Task not ready yet
           $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /matrix/catalog/calculation-versions:
+    get:
+      summary: Get all calculation versions
+      operationId: getCalculationVersions
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid calculation versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationVersionCatalogResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /matrix/catalog/substances:
+    get:
+      summary: Get all substances
+      operationId: getSubstances
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid substances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstanceCatalogResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
 
@@ -145,6 +187,12 @@ components:
             $ref: '#/components/schemas/ErrorMessage'
 
   schemas:
+    CalculationVersion:
+      type: string
+      description: Calculation version (must be one of the values from GET /matrix/catalog/calculation-versions)
+      examples:
+        - "2025.2"
+
     Point:
       type: object
       additionalProperties: false
@@ -168,19 +216,48 @@ components:
 
     Substance:
       type: string
-      description: Substance
+      description: Substance (must be one of the values from GET /matrix/catalog/substances)
       examples:
         - "NOx"
         - "NH3"
 
+    MatrixResultRecord:
+      type: object
+      description: >
+        Represents a single matrix result row.
+      additionalProperties: false
+      properties:
+        source_point:
+          $ref: '#/components/schemas/Point'
+        receptor:
+          $ref: '#/components/schemas/Receptor'
+        substance:
+          $ref: '#/components/schemas/Substance'
+        value:
+          type: number
+          format: float
+          description: Calculated matrix value
+      required:
+        - source_point
+        - receptor
+        - substance
+        - value
+      examples:
+        - source_point:
+            x: 100
+            y: 200
+          receptor: 100001
+          substance: "NOx"
+          value: 12.34
+
     ErrorMessage:
       type: object
       required:
-        - title
+        - code
       properties:
-        title:
+        code:
           type: string
-        error:
+        message:
           type: string
 
     MatrixQueryRequest:
@@ -190,30 +267,30 @@ components:
       additionalProperties: false
       properties:
         calculation_version:
-          description: Filter by calculation version
-          type: string
+          description: Query by calculation version
+          $ref: "#/components/schemas/CalculationVersion"
         substances:
-          description: Filter by substance(s)
+          description: Query by substance(s)
           type: array
           items:
             $ref: "#/components/schemas/Substance"
         source_characteristics:
           type: object
-          description: Filter by source characteristics
+          description: Query by source characteristics
           title: SourceCharacteristics
           additionalProperties: false
           properties:
             height:
-              description: Filter by source height
+              description: Query by source height
               type: number
             heat_content:
-              description: Filter by heat content
+              description: Query by heat content
               type: number
             spread:
-              description: Filter by spread
+              description: Query by spread
               type: number
             emission_diurnal_variation:
-              description: Filter by emission diurnal variation ID
+              description: Query by emission diurnal variation ID
               type: integer
           required:
             - height
@@ -227,7 +304,7 @@ components:
               emission_diurnal_variation: 2
               particle_size_distribution: 0
         receptors:
-          description: Filter by receptor ID(s)
+          description: Query by receptor ID(s)
           type: array
           items:
             $ref: '#/components/schemas/Receptor'
@@ -320,31 +397,30 @@ components:
               substance: "NOx"
               value: 12.34
 
-    MatrixResultRecord:
+    CalculationVersionCatalogResponse:
       type: object
-      description: >
-        Represents a single matrix result row.
+      description: Catalog response containing the list of valid calculation versions
       additionalProperties: false
       properties:
-        source_point:
-          $ref: '#/components/schemas/Point'
-        receptor:
-          $ref: '#/components/schemas/Receptor'
-        substance:
-          $ref: '#/components/schemas/Substance'
-        value:
-          type: number
-          format: float
-          description: Calculated matrix value
+        calculation_versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationVersion'
       required:
-        - source_point
-        - receptor
-        - substance
-        - value
+        - calculation_versions
       examples:
-        - source_point:
-            x: 100
-            y: 200
-          receptor: 100001
-          substance: "NOx"
-          value: 12.34
+        - calculation_versions: ["2025.1", "2025.2"]
+
+    SubstanceCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid substances
+      additionalProperties: false
+      properties:
+        substances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Substance'
+      required:
+        - substances
+      examples:
+        - substances: ["NOx", "NH3"]
