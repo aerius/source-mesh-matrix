@@ -17,28 +17,411 @@
 openapi: 3.1.0
 
 info:
-  title: Source Mesh Matrix API
+  title: Source Mesh Matrix Public API
   description: |
-    TODO
+    Generic public service to query 'SMM' (source mesh matrix) values.
   license:
     name: Apache License, version 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
   version: 0.0.1
 
 servers:
-  - url: /api/v1/
-    description: Basic URL relative to this page.
+  - url: /api/v1
+    description: Base URL relative to this page
+tags:
+  - name: query
+    description: Query operations for retrieving matrix values
+  - name: catalog
+    description: Endpoints that return valid query values
 
-tags: []
+paths:
+  /matrix/query:
+    post:
+      summary: Start matrix query
+      operationId: createMatrixQuery
+      tags:
+        - query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatrixQueryRequest'
+      responses:
+        '202':
+          description: Query accepted (for asynchronous processing)
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '429':
+          description: Too Many Requests
+          headers:
+            Retry-After:
+              description: The suggested polling interval in seconds
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
 
-paths: {}
+  /matrix/query/status/{queryId}:
+    get:
+      summary: Get matrix query status
+      operationId: getMatrixQueryStatus
+      tags:
+        - query
+      parameters:
+        - name: queryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Query status
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+            Retry-After:
+              $ref: '#/components/headers/RetryAfterHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /matrix/query/{queryId}:
+    get:
+      summary: Get matrix query result
+      operationId: getMatrixQueryResult
+      tags:
+        - query
+      parameters:
+        - name: queryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Query result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryResultResponse'
+        '404':
+          description: Task not found
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          description: Task not ready yet
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /matrix/catalog/calculation-versions:
+    get:
+      summary: Get all calculation versions
+      operationId: getCalculationVersions
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid calculation versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationVersionCatalogResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /matrix/catalog/substances:
+    get:
+      summary: Get all substances
+      operationId: getSubstances
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid substances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstanceCatalogResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
 
 components:
+  headers:
+    LocationHeader:
+      description: The URL to poll for the current status of the asynchronous query
+      schema:
+        type: string
+        format: uri
+
+    RetryAfterHeader:
+      description: The suggested polling interval in seconds
+      schema:
+        type: integer
+
 
   responses:
-    ClientError:
-      description: |
-        Error in input
-      content: { }
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
 
-  schemas: {}
+  schemas:
+    CalculationVersion:
+      type: string
+      description: Calculation version (must be one of the values from GET /matrix/catalog/calculation-versions)
+      examples:
+        - "2025.2"
+
+    Point:
+      type: object
+      additionalProperties: false
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - y
+      examples:
+        - x: 100
+          y: 200
+
+    Substance:
+      type: string
+      description: Substance (must be one of the values from GET /matrix/catalog/substances)
+      examples:
+        - "NOx"
+        - "NH3"
+
+    MatrixResultRecord:
+      type: object
+      description: >
+        Represents a single matrix result row.
+      additionalProperties: false
+      properties:
+        source_point:
+          $ref: '#/components/schemas/Point'
+        mesh_point:
+          $ref: '#/components/schemas/Point'
+        substance:
+          $ref: '#/components/schemas/Substance'
+        value:
+          type: number
+          format: float
+          description: Calculated matrix value
+      required:
+        - source_point
+        - mesh_point
+        - substance
+        - value
+      examples:
+        - source_point:
+            x: 100
+            y: 200
+          mesh_point:
+            x: 100001
+            y: 400001
+          substance: "NOx"
+          value: 12.34
+
+    ErrorMessage:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    MatrixQueryRequest:
+      type: object
+      description: >
+        Parameters for submitting a matrix query.
+      additionalProperties: false
+      properties:
+        calculation_version:
+          description: Query by calculation version
+          $ref: "#/components/schemas/CalculationVersion"
+        substances:
+          description: Query by substance(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/Substance"
+        source_characteristics:
+          type: object
+          description: Query by source characteristics
+          title: SourceCharacteristics
+          additionalProperties: false
+          properties:
+            height:
+              description: Query by source height
+              type: number
+            heat_content:
+              description: Query by heat content
+              type: number
+            spread:
+              description: Query by spread
+              type: number
+            emission_diurnal_variation:
+              description: Query by emission diurnal variation ID
+              type: integer
+          required:
+            - height
+            - heat_content
+            - spread
+            - emission_diurnal_variation
+          examples:
+            - height: 1.0
+              heat_content: 10.5
+              spread: 1.0
+              emission_diurnal_variation: 2
+              particle_size_distribution: 0
+        mesh_points:
+          description: Query by Mesh-point coordinate(s) 
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+        source_points:
+          description: List of exact source coordinate points.
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Point'
+      required:
+        - calculation_version
+        - substances
+        - source_characteristics
+        - mesh_points
+        - source_points
+      examples:
+        - calculation_version: "2025.2"
+          substances: ["NOx", "NH3"]
+          source_characteristics:
+            height: 1.0
+            heat_content: 10.5
+            spread: 1.0
+            emission_diurnal_variation: 2
+            particle_size_distribution: 0
+          mesh_points:
+            - x: 100001
+              y: 400001
+            - x: 100002
+              y: 400002
+          source_points:
+            - x: 100
+              y: 200
+            - x: 150
+              y: 250
+
+    MatrixQueryStatusResponse:
+      type: object
+      description: >
+        Represents the current status of an asynchronous matrix query.
+      additionalProperties: false
+      properties:
+        status:
+          description: The current processing status of the query
+          type: string
+          enum:
+            - Processing
+            - Completed
+            - Rejected
+            - Failed
+        statusUrl:
+          description: The URL to poll for the current status of the asynchronous query
+          type: string
+          format: uri
+      required:
+        - status
+        - statusUrl
+      examples:
+        - status: "Processing"
+          statusUrl: "/api/v1/matrix/query/status/123"
+        - status: "Completed"
+          statusUrl: "/api/v1/matrix/query/status/123"
+
+    MatrixQueryResultResponse:
+      type: object
+      description: >
+        Query result containing the original query and the resulting matrix records.
+        The records only include fields that vary per result.
+        Fields provided in the query are not repeated in each record to avoid redundancy.
+      additionalProperties: false
+      properties:
+        query:
+          $ref: '#/components/schemas/MatrixQueryRequest'
+        records:
+          type: array
+          description: Matching matrix values for the submitted query
+          items:
+            $ref: '#/components/schemas/MatrixResultRecord'
+      required:
+        - query
+        - records
+      examples:
+        - query:
+            calculation_version: "2025.2"
+            substances: ["NOx"]
+            mesh_points:
+              - x: 100001
+                y: 400001
+            source_points:
+              - x: 100
+                y: 200
+          records:
+            - source_point:
+                x: 100
+                y: 200
+              mesh_point:
+                x: 100001
+                y: 400001
+              substance: "NOx"
+              value: 12.34
+
+    CalculationVersionCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid calculation versions
+      additionalProperties: false
+      properties:
+        calculation_versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationVersion'
+      required:
+        - calculation_versions
+      examples:
+        - calculation_versions: ["2025.1", "2025.2"]
+
+    SubstanceCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid substances
+      additionalProperties: false
+      properties:
+        substances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Substance'
+      required:
+        - substances
+      examples:
+        - substances: ["NOx", "NH3"]
