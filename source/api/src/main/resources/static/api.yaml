@@ -87,11 +87,6 @@ paths:
       responses:
         '200':
           description: Query status
-          headers:
-            Location:
-              $ref: '#/components/headers/LocationHeader'
-            Retry-After:
-              $ref: '#/components/headers/RetryAfterHeader'
           content:
             application/json:
               schema:
@@ -119,11 +114,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryResultResponse'
+        '202':
+          description: Query is still being processed; poll the statusUrl for progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
         '404':
           description: Task not found
-          $ref: '#/components/responses/ErrorResponse'
-        '409':
-          description: Task not ready yet
           $ref: '#/components/responses/ErrorResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
@@ -295,9 +293,8 @@ components:
               heat_content: 10.5
               spread: 1.0
               emission_diurnal_variation: 2
-              particle_size_distribution: 0
         mesh_points:
-          description: Query by Mesh-point coordinate(s) 
+          description: Query by Mesh-point coordinate(s)
           type: array
           items:
             $ref: '#/components/schemas/Point'
@@ -321,7 +318,6 @@ components:
             heat_content: 10.5
             spread: 1.0
             emission_diurnal_variation: 2
-            particle_size_distribution: 0
           mesh_points:
             - x: 100001
               y: 400001
@@ -339,6 +335,10 @@ components:
         Represents the current status of an asynchronous matrix query.
       additionalProperties: false
       properties:
+        queryId:
+          description: Unique identifier of the asynchronous query
+          type: string
+          format: uuid
         status:
           description: The current processing status of the query
           type: string
@@ -347,18 +347,30 @@ components:
             - Completed
             - Rejected
             - Failed
+        pollAfterSeconds:
+          description: Suggested number of seconds to wait before polling status again
+          type: integer
         statusUrl:
           description: The URL to poll for the current status of the asynchronous query
           type: string
           format: uri
+        resultUrl:
+          description: The URL to retrieve query results; only set when status is Completed
+          type: string
+          format: uri
       required:
+        - queryId
         - status
         - statusUrl
       examples:
-        - status: "Processing"
-          statusUrl: "/api/v1/matrix/query/status/123"
-        - status: "Completed"
-          statusUrl: "/api/v1/matrix/query/status/123"
+        - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          status: "Processing"
+          pollAfterSeconds: 2
+          statusUrl: "https://api.example.com/api/v1/matrix/query/status/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+        - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          status: "Completed"
+          statusUrl: "https://api.example.com/api/v1/matrix/query/status/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          resultUrl: "https://api.example.com/api/v1/matrix/query/5d8f7602-c81d-498f-af58-9f1238ad4f15"
 
     MatrixQueryResultResponse:
       type: object
@@ -382,6 +394,11 @@ components:
         - query:
             calculation_version: "2025.2"
             substances: ["NOx"]
+            source_characteristics:
+              height: 1.0
+              heat_content: 10.5
+              spread: 1.0
+              emission_diurnal_variation: 2
             mesh_points:
               - x: 100001
                 y: 400001
