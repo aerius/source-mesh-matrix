@@ -1,4 +1,4 @@
-# ADR-001: Asynchronous matrix query API design (REST-inspired)
+# ADR-002: Asynchronous matrix query API design (REST-inspired)
 
 Date: 2026-04-24 | Status: Accepted
 
@@ -13,7 +13,7 @@ The API must support execution of computationally intensive matrix queries that 
 
 Additionally:
 
-* Listing all queries (`GET /matrix/queries`) is currently not supported but may be introduced in the future when authentication and user scoping are available
+* Listing all queries (`GET /matrix/queries`) will probably not be implemented given that the queries are temporarily available anyway.
 * The API should remain as **RESTful and predictable as possible**
 
 Several designs were considered internally. No external examples or prior art were adopted directly. Alternative designs were considered internally. These approaches introduced ambiguity in resource modeling and deviated from REST conventions.
