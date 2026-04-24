@@ -217,10 +217,10 @@ paths:
 components:
   headers:
     LocationHeader:
-      description: The URL to poll for the current status of the asynchronous query
+      description: The (relative) URL to poll for the current status of the asynchronous query
       schema:
         type: string
-        format: uri
+        format: uri-reference
 
   responses:
     ErrorResponse:
