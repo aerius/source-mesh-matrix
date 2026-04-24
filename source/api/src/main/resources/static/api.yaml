@@ -82,12 +82,7 @@ paths:
       tags:
         - query
       parameters:
-        - name: queryId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/QueryIdPathParameter'
       responses:
         '200':
           description: Query status
@@ -115,12 +110,7 @@ paths:
       tags:
         - query
       parameters:
-        - name: queryId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/QueryIdPathParameter'
       responses:
         '200':
           description: Query result
@@ -209,6 +199,15 @@ paths:
 
 
 components:
+
+  parameters:
+    QueryIdPathParameter:
+      name: queryId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/QueryId'
+
   headers:
     LocationHeader:
       description: The (relative) URL to poll for the current status of the asynchronous query
@@ -225,6 +224,14 @@ components:
             $ref: '#/components/schemas/ErrorMessage'
 
   schemas:
+
+    QueryId:
+      type: string
+      description: ID of the query
+      format: uuid
+      examples:
+        - "550e8400-e29b-41d4-a716-446655440000"
+
 
     CalculationVersion:
       type: string
