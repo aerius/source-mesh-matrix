@@ -414,13 +414,13 @@ components:
           description: Suggested number of seconds to wait before polling status again
           type: integer
         statusUrl:
-          description: The URL to poll for the current status of the asynchronous query
+          description: The (relative) URL to poll for the current status of the asynchronous query
           type: string
-          format: uri
+          format: uri-reference
         resultUrl:
-          description: The URL to retrieve query results; only set when status is Completed
+          description: The (relative) URL to retrieve query results; only set when status is Completed
           type: string
-          format: uri
+          format: uri-reference
       required:
         - queryId
         - status
@@ -429,11 +429,11 @@ components:
         - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
           status: "Processing"
           pollAfterSeconds: 2
-          statusUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          statusUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
         - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
           status: "Completed"
-          statusUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
-          resultUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15/result"
+          statusUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          resultUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15/result"
 
     MatrixQueryResultResponse:
       type: object
