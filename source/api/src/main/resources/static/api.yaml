@@ -35,7 +35,7 @@ tags:
     description: Endpoints that return valid query values
 
 paths:
-  /matrix/query:
+  /matrix/queries:
     post:
       summary: Start matrix query
       operationId: createMatrixQuery
@@ -69,9 +69,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
         default:
-          $ref: '#/components/responses/ErrorResponse'
+          description: Unexpected error while creating a matrix query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
-  /matrix/query/status/{queryId}:
+  /matrix/queries/{queryId}:
     get:
       summary: Get matrix query status
       operationId: getMatrixQueryStatus
@@ -91,10 +95,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '404':
+          description: Query not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
         default:
-          $ref: '#/components/responses/ErrorResponse'
+          description: Unexpected error while retrieving matrix query status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
-  /matrix/query/{queryId}:
+  /matrix/queries/{queryId}/result:
     get:
       summary: Get matrix query result
       operationId: getMatrixQueryResult
@@ -121,10 +135,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/MatrixQueryStatusResponse'
         '404':
-          description: Task not found
-          $ref: '#/components/responses/ErrorResponse'
+          description: Query not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '410':
+          description: Query result is no longer available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
         default:
-          $ref: '#/components/responses/ErrorResponse'
+          description: Unexpected error while retrieving matrix query result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
   /matrix/catalog/calculation-versions:
     get:
@@ -140,7 +167,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculationVersionCatalogResponse'
         default:
-          $ref: '#/components/responses/ErrorResponse'
+          description: Unexpected error while retrieving calculation versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
   /matrix/catalog/substances:
     get:
@@ -156,7 +187,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/SubstanceCatalogResponse'
         default:
-          $ref: '#/components/responses/ErrorResponse'
+          description: Unexpected error while retrieving substances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
 
 components:
@@ -166,12 +201,6 @@ components:
       schema:
         type: string
         format: uri
-
-    RetryAfterHeader:
-      description: The suggested polling interval in seconds
-      schema:
-        type: integer
-
 
   responses:
     ErrorResponse:
@@ -366,11 +395,11 @@ components:
         - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
           status: "Processing"
           pollAfterSeconds: 2
-          statusUrl: "https://api.example.com/api/v1/matrix/query/status/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          statusUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
         - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
           status: "Completed"
-          statusUrl: "https://api.example.com/api/v1/matrix/query/status/5d8f7602-c81d-498f-af58-9f1238ad4f15"
-          resultUrl: "https://api.example.com/api/v1/matrix/query/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          statusUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          resultUrl: "https://api.example.com/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15/result"
 
     MatrixQueryResultResponse:
       type: object
