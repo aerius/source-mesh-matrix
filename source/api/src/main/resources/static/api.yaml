@@ -227,7 +227,7 @@ components:
 
     QueryId:
       type: string
-      description: ID of the query
+      description: Unique identifier of the asynchronous query
       format: uuid
       examples:
         - "550e8400-e29b-41d4-a716-446655440000"
@@ -400,9 +400,7 @@ components:
       additionalProperties: false
       properties:
         queryId:
-          description: Unique identifier of the asynchronous query
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/QueryId'
         status:
           description: The current processing status of the query
           type: string
