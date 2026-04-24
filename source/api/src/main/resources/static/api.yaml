@@ -140,12 +140,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
-        '410':
-          description: Query result is no longer available
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorMessage'
         default:
           description: Unexpected error while retrieving matrix query result
           content:

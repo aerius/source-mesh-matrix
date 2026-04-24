@@ -16,7 +16,7 @@ Additionally:
 * Listing all queries (`GET /matrix/queries`) will probably not be implemented given that the queries are temporarily available anyway.
 * The API should remain as **RESTful and predictable as possible**
 
-Several designs were considered internally. No external examples or prior art were adopted directly. Alternative designs were considered internally. These approaches introduced ambiguity in resource modeling and deviated from REST conventions.
+Alternative designs were considered internally. These approaches introduced ambiguity in resource modeling and deviated from REST conventions.
 
 
 ## Decision
@@ -45,9 +45,7 @@ Behavior:
 * `GET /matrix/queries/{queryId}/result`
 
     * `200 OK` → returns result
-    * `202 Accepted` → still processing
-    * `404 Not Found` → unknown or already consumed
-    * Optionally `410 Gone` → explicitly indicates expired/consumed result
+    * `404 Not Found` → unknown, still processing or already deleted
 
 
 ## Rationale
@@ -107,7 +105,7 @@ Although `POST /matrix/queries` implies a collection, REST does **not require** 
 GET /matrix/queries
 ```
 
-The API can support creation without exposing listing, which fits system constraints.
+The API can support creation without exposing listing, it that fits system constraints.
 
 
 ### Result lifecycle
@@ -119,8 +117,7 @@ Clients should not assume results are stored indefinitely and should retrieve th
 The API may return:
 
 * `200 OK` → result available
-* `202 Accepted` → still processing
-* `404 Not Found` or `410 Gone` → result no longer available
+* `404 Not Found` → result not found (yet) or no longer available
 
 
 ### Alternatives considered
@@ -144,4 +141,4 @@ An action-oriented (RPC-style) design was considered but not chosen. It models o
 
 ### Neutral:
 
-* Optional use of `410 Gone` vs `404 Not Found` depends on implementation preference
+* ...
