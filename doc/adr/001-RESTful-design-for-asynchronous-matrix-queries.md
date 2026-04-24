@@ -1,6 +1,6 @@
 # ADR-001: Asynchronous matrix query API design (REST-inspired)
 
-Date: 2026-01-01 | Status: Accepted
+Date: 2026-04-24 | Status: Accepted
 
 
 ## Problem
