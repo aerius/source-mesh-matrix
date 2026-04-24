@@ -193,6 +193,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
 
+  /matrix/catalog/result-types:
+    get:
+      summary: Get all result types
+      operationId: getResultTypes
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid result types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultTypeCatalogResponse'
+        default:
+          description: Unexpected error while retrieving result types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
 
 components:
   headers:
@@ -211,11 +231,26 @@ components:
             $ref: '#/components/schemas/ErrorMessage'
 
   schemas:
+
     CalculationVersion:
       type: string
       description: Calculation version (must be one of the values from GET /matrix/catalog/calculation-versions)
       examples:
         - "2025.2"
+
+    Substance:
+      type: string
+      description: Substance (must be one of the values from GET /matrix/catalog/substances)
+      examples:
+        - "NOx"
+        - "NH3"
+
+    ResultType:
+      type: string
+      description: ResultType (must be one of the values from GET /matrix/catalog/result-types)
+      examples:
+        - "Deposition"
+        - "Concentration"
 
     Point:
       type: object
@@ -227,17 +262,10 @@ components:
           type: integer
       required:
         - x
-        - y
+        - ySubstance
       examples:
         - x: 100
           y: 200
-
-    Substance:
-      type: string
-      description: Substance (must be one of the values from GET /matrix/catalog/substances)
-      examples:
-        - "NOx"
-        - "NH3"
 
     MatrixResultRecord:
       type: object
@@ -333,6 +361,11 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Point'
+        result_types:
+          description: Query by result type(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/ResultType"
       required:
         - calculation_version
         - substances
@@ -357,6 +390,7 @@ components:
               y: 200
             - x: 150
               y: 250
+          result_types: ["Deposition", "Concentration"]
 
     MatrixQueryStatusResponse:
       type: object
@@ -434,6 +468,7 @@ components:
             source_points:
               - x: 100
                 y: 200
+            result_types: ["Deposition", "Concentration"]
           records:
             - source_point:
                 x: 100
@@ -471,3 +506,17 @@ components:
         - substances
       examples:
         - substances: ["NOx", "NH3"]
+
+    ResultTypeCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid result types
+      additionalProperties: false
+      properties:
+        resultTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultType'
+      required:
+        - resultTypes
+      examples:
+        - resultTypes: ["Deposition", "Concentration"]
