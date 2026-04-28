@@ -280,6 +280,8 @@ components:
           $ref: '#/components/schemas/Point'
         substance:
           $ref: '#/components/schemas/Substance'
+        result_type:
+          $ref: '#/components/schemas/ResultType'
         value:
           type: number
           format: float
@@ -288,6 +290,7 @@ components:
         - source_point
         - mesh_point
         - substance
+        - result_type
         - value
       examples:
         - source_point:
@@ -297,6 +300,7 @@ components:
             x: 100001
             y: 400001
           substance: "NOx"
+          result_type: "Deposition"
           value: 12.34
 
     ErrorMessage:

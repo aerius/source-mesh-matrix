@@ -105,7 +105,7 @@ Although `POST /matrix/queries` implies a collection, REST does **not require** 
 GET /matrix/queries
 ```
 
-The API can support creation without exposing listing, it that fits system constraints.
+The API can support creation without exposing listing, if that fits system constraints.
 
 
 ### Result lifecycle
