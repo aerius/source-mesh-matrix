@@ -89,12 +89,12 @@
           <apiPackage>nl.aerius.smm.api.generated.api</apiPackage>
           <!-- Package for the model (or domain) side of things -->
           <modelPackage>nl.aerius.smm.api.generated.model</modelPackage>
+          <modelNamePrefix>Rest</modelNamePrefix>
           <!--
             Prevent generating too much by only specifying one file.
             The ApiUtil is fairly harmless and is actually used in the delegate pattern.
             Reason to not want all the default generated files: we'd need more dependencies.
           -->
-          <modelNamePrefix>Rest</modelNamePrefix>
           <supportingFilesToGenerate>
             ApiUtil.java
           </supportingFilesToGenerate>
@@ -111,6 +111,7 @@
 
             <!-- Ensure generated models implement serializable -->
             <serializableModel>true</serializableModel>
+
           </configOptions>
           <globalProperties>
             <!--

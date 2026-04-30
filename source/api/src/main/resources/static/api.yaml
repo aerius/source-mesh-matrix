@@ -17,28 +17,508 @@
 openapi: 3.1.0
 
 info:
-  title: Source Mesh Matrix API
+  title: Source Mesh Matrix Public API
   description: |
-    TODO
+    Generic public service to query 'SMM' (source mesh matrix) values.
   license:
     name: Apache License, version 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
   version: 0.0.1
 
 servers:
-  - url: /api/v1/
-    description: Basic URL relative to this page.
+  - url: /api/v1
+    description: Base URL relative to this page
+tags:
+  - name: query
+    description: Query operations for retrieving matrix values
+  - name: catalog
+    description: Endpoints that return valid query values
 
-tags: []
+paths:
+  /matrix/queries:
+    post:
+      summary: Start matrix query
+      operationId: createMatrixQuery
+      tags:
+        - query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatrixQueryRequest'
+      responses:
+        '202':
+          description: Query accepted (for asynchronous processing)
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '429':
+          description: Too Many Requests
+          headers:
+            Retry-After:
+              description: The suggested polling interval in seconds
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        default:
+          description: Unexpected error while creating a matrix query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
-paths: {}
+  /matrix/queries/{queryId}:
+    get:
+      summary: Get matrix query status
+      operationId: getMatrixQueryStatus
+      tags:
+        - query
+      parameters:
+        - $ref: '#/components/parameters/QueryIdPathParameter'
+      responses:
+        '200':
+          description: Query status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '404':
+          description: Query not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        default:
+          description: Unexpected error while retrieving matrix query status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /matrix/queries/{queryId}/result:
+    get:
+      summary: Get matrix query result
+      operationId: getMatrixQueryResult
+      tags:
+        - query
+      parameters:
+        - $ref: '#/components/parameters/QueryIdPathParameter'
+      responses:
+        '200':
+          description: Query result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryResultResponse'
+        '202':
+          description: Query is still being processed; poll the statusUrl for progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatrixQueryStatusResponse'
+        '404':
+          description: Query not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        default:
+          description: Unexpected error while retrieving matrix query result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /matrix/catalog/calculation-versions:
+    get:
+      summary: Get all calculation versions
+      operationId: getCalculationVersions
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid calculation versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationVersionCatalogResponse'
+        default:
+          description: Unexpected error while retrieving calculation versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /matrix/catalog/substances:
+    get:
+      summary: Get all substances
+      operationId: getSubstances
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid substances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubstanceCatalogResponse'
+        default:
+          description: Unexpected error while retrieving substances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /matrix/catalog/result-types:
+    get:
+      summary: Get all result types
+      operationId: getResultTypes
+      tags:
+        - catalog
+      responses:
+        '200':
+          description: List of valid result types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultTypeCatalogResponse'
+        default:
+          description: Unexpected error while retrieving result types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
 
 components:
 
-  responses:
-    ClientError:
-      description: |
-        Error in input
-      content: { }
+  parameters:
+    QueryIdPathParameter:
+      name: queryId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/QueryId'
 
-  schemas: {}
+  headers:
+    LocationHeader:
+      description: The (relative) URL to poll for the current status of the asynchronous query
+      schema:
+        type: string
+        format: uri-reference
+
+  responses:
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+
+  schemas:
+
+    QueryId:
+      type: string
+      description: Unique identifier of the asynchronous query
+      examples:
+        - "550e8400-e29b-41d4-a716-446655440000"
+
+
+    CalculationVersion:
+      type: string
+      description: Calculation version (must be one of the values from GET /matrix/catalog/calculation-versions)
+      examples:
+        - "2025.2"
+
+    Substance:
+      type: string
+      description: Substance (must be one of the values from GET /matrix/catalog/substances)
+      examples:
+        - "NOx"
+        - "NH3"
+
+    ResultType:
+      type: string
+      description: ResultType (must be one of the values from GET /matrix/catalog/result-types)
+      examples:
+        - "Deposition"
+        - "Concentration"
+
+    Point:
+      type: object
+      additionalProperties: false
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - ySubstance
+      examples:
+        - x: 100
+          y: 200
+
+    MatrixResultRecord:
+      type: object
+      description: >
+        Represents a single matrix result row.
+      additionalProperties: false
+      properties:
+        source_point:
+          $ref: '#/components/schemas/Point'
+        mesh_point:
+          $ref: '#/components/schemas/Point'
+        substance:
+          $ref: '#/components/schemas/Substance'
+        result_type:
+          $ref: '#/components/schemas/ResultType'
+        value:
+          type: number
+          format: float
+          description: Calculated matrix value
+      required:
+        - source_point
+        - mesh_point
+        - substance
+        - result_type
+        - value
+      examples:
+        - source_point:
+            x: 100
+            y: 200
+          mesh_point:
+            x: 100001
+            y: 400001
+          substance: "NOx"
+          result_type: "Deposition"
+          value: 12.34
+
+    ErrorMessage:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    MatrixQueryRequest:
+      type: object
+      description: >
+        Parameters for submitting a matrix query.
+      additionalProperties: false
+      properties:
+        calculation_version:
+          description: Query by calculation version
+          $ref: "#/components/schemas/CalculationVersion"
+        substances:
+          description: Query by substance(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/Substance"
+        source_characteristics:
+          type: object
+          description: Query by source characteristics
+          title: SourceCharacteristics
+          additionalProperties: false
+          properties:
+            height:
+              description: Query by source height
+              type: number
+            heat_content:
+              description: Query by heat content
+              type: number
+            spread:
+              description: Query by spread
+              type: number
+            emission_diurnal_variation:
+              description: Query by emission diurnal variation ID
+              type: integer
+          required:
+            - height
+            - heat_content
+            - spread
+            - emission_diurnal_variation
+          examples:
+            - height: 1.0
+              heat_content: 10.5
+              spread: 1.0
+              emission_diurnal_variation: 2
+        mesh_points:
+          description: Query by Mesh-point coordinate(s)
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+        source_points:
+          description: List of exact source coordinate points.
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Point'
+        result_types:
+          description: Query by result type(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/ResultType"
+      required:
+        - calculation_version
+        - substances
+        - source_characteristics
+        - mesh_points
+        - source_points
+      examples:
+        - calculation_version: "2025.2"
+          substances: ["NOx", "NH3"]
+          source_characteristics:
+            height: 1.0
+            heat_content: 10.5
+            spread: 1.0
+            emission_diurnal_variation: 2
+          mesh_points:
+            - x: 100001
+              y: 400001
+            - x: 100002
+              y: 400002
+          source_points:
+            - x: 100
+              y: 200
+            - x: 150
+              y: 250
+          result_types: ["Deposition", "Concentration"]
+
+    MatrixQueryStatusResponse:
+      type: object
+      description: >
+        Represents the current status of an asynchronous matrix query.
+      additionalProperties: false
+      properties:
+        queryId:
+          $ref: '#/components/schemas/QueryId'
+        status:
+          description: The current processing status of the query
+          type: string
+          enum:
+            - Processing
+            - Completed
+            - Rejected
+            - Failed
+        pollAfterSeconds:
+          description: Suggested number of seconds to wait before polling status again
+          type: integer
+        statusUrl:
+          description: The (relative) URL to poll for the current status of the asynchronous query
+          type: string
+          format: uri-reference
+        resultUrl:
+          description: The (relative) URL to retrieve query results; only set when status is Completed
+          type: string
+          format: uri-reference
+      required:
+        - queryId
+        - status
+        - statusUrl
+      examples:
+        - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          status: "Processing"
+          pollAfterSeconds: 2
+          statusUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+        - queryId: "5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          status: "Completed"
+          statusUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15"
+          resultUrl: "/api/v1/matrix/queries/5d8f7602-c81d-498f-af58-9f1238ad4f15/result"
+
+    MatrixQueryResultResponse:
+      type: object
+      description: >
+        Query result containing the original query and the resulting matrix records.
+        The records only include fields that vary per result.
+        Fields provided in the query are not repeated in each record to avoid redundancy.
+      additionalProperties: false
+      properties:
+        query:
+          $ref: '#/components/schemas/MatrixQueryRequest'
+        records:
+          type: array
+          description: Matching matrix values for the submitted query
+          items:
+            $ref: '#/components/schemas/MatrixResultRecord'
+      required:
+        - query
+        - records
+      examples:
+        - query:
+            calculation_version: "2025.2"
+            substances: ["NOx"]
+            source_characteristics:
+              height: 1.0
+              heat_content: 10.5
+              spread: 1.0
+              emission_diurnal_variation: 2
+            mesh_points:
+              - x: 100001
+                y: 400001
+            source_points:
+              - x: 100
+                y: 200
+            result_types: ["Deposition", "Concentration"]
+          records:
+            - source_point:
+                x: 100
+                y: 200
+              mesh_point:
+                x: 100001
+                y: 400001
+              substance: "NOx"
+              value: 12.34
+
+    CalculationVersionCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid calculation versions
+      additionalProperties: false
+      properties:
+        calculation_versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationVersion'
+      required:
+        - calculation_versions
+      examples:
+        - calculation_versions: ["2025.1", "2025.2"]
+
+    SubstanceCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid substances
+      additionalProperties: false
+      properties:
+        substances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Substance'
+      required:
+        - substances
+      examples:
+        - substances: ["NOx", "NH3"]
+
+    ResultTypeCatalogResponse:
+      type: object
+      description: Catalog response containing the list of valid result types
+      additionalProperties: false
+      properties:
+        resultTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultType'
+      required:
+        - resultTypes
+      examples:
+        - resultTypes: ["Deposition", "Concentration"]
