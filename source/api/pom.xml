@@ -29,6 +29,11 @@
   <name>source-mesh-matrix API</name>
   <description>API service for source-mesh-matrix</description>
 
+  <properties>
+    <smm.api.generated.base>nl.aerius.smm.api.generated</smm.api.generated.base>
+    <mapstruct.version>1.6.3</mapstruct.version>
+  </properties>
+
   <dependencies>
     <!-- Spring boot basic dependencies -->
     <dependency>
@@ -43,7 +48,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
-
     <!-- Dependencies for generated code -->
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
@@ -54,10 +58,21 @@
       <artifactId>jackson-databind-nullable</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -75,6 +90,18 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
 
       <plugin>
         <groupId>org.openapitools</groupId>
@@ -86,9 +113,9 @@
           <!-- Location where generated code should end up -->
           <output>${project.build.directory}/openapi/</output>
           <!-- Package for the api side of things -->
-          <apiPackage>nl.aerius.smm.api.generated.api</apiPackage>
+          <apiPackage>${smm.api.generated.base}.openapi.api</apiPackage>
           <!-- Package for the model (or domain) side of things -->
-          <modelPackage>nl.aerius.smm.api.generated.model</modelPackage>
+          <modelPackage>${smm.api.generated.base}.openapi.model</modelPackage>
           <modelNamePrefix>Rest</modelNamePrefix>
           <!--
             Prevent generating too much by only specifying one file.
@@ -112,6 +139,11 @@
             <!-- Ensure generated models implement serializable -->
             <serializableModel>true</serializableModel>
 
+            <!-- Generate builders for a fluent API -->
+            <generateBuilders>true</generateBuilders>
+
+            <!-- Split endpoints into different classes according to tags -->
+            <useTags>true</useTags>
           </configOptions>
           <globalProperties>
             <!--
@@ -136,6 +168,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 </project>
