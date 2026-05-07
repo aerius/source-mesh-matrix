@@ -93,7 +93,7 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve sourcePoint y");
 
     assertEquals(2, rest.getRecords().size(), "domain -> REST should preserve result record count");
-    assertEquals(1.25f, rest.getRecords().get(0).getValue(), 0.0001f,
+    assertEquals(1.25d, rest.getRecords().get(0).getValue(), 0.0001d,
         "domain -> REST should map first record value (Double to Float)");
     assertNull(rest.getRecords().get(1).getValue(),
         "domain -> REST should map second record null value to null Float");

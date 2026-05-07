@@ -284,7 +284,7 @@ components:
           $ref: '#/components/schemas/ResultType'
         value:
           type: number
-          format: float
+          format: double
           description: Calculated matrix value
       required:
         - source_point
