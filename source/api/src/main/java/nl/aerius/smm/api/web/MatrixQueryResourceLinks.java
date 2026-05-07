@@ -21,7 +21,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import nl.aerius.smm.api.config.AppEndpointsConfig.EndpointsProperties;
+import nl.aerius.smm.api.config.EndpointsConfig.EndpointsProperties;
 
 /**
  * Builds root-relative matrix query paths from {@link EndpointsProperties#basePath()} ({@code app.endpoints.base-path}).

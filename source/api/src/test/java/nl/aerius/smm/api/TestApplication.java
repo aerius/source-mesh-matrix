@@ -21,7 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import nl.aerius.smm.api.config.AppEndpointsConfig;
+import nl.aerius.smm.api.config.EndpointsConfig;
 import nl.aerius.smm.api.web.MatrixQueryResourceLinks;
 
 /**
@@ -33,6 +33,6 @@ import nl.aerius.smm.api.web.MatrixQueryResourceLinks;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "nl.aerius.smm.api.mapper")
-@Import({ MatrixQueryResourceLinks.class, AppEndpointsConfig.class })
+@Import({ MatrixQueryResourceLinks.class, EndpointsConfig.class })
 public class TestApplication {
 }

@@ -18,17 +18,15 @@ package nl.aerius.smm.api.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(AppEndpointsConfig.EndpointsProperties.class)
-public class AppEndpointsConfig {
+@EnableConfigurationProperties(EndpointsConfig.EndpointsProperties.class)
+public class EndpointsConfig {
 
-  /** Binds {@code app.endpoints.*} (public API path prefix for links and, via bridge, generated controllers). */
-  @ConfigurationProperties(prefix = "app.endpoints")
-  public record EndpointsProperties(String basePath) {
-    public EndpointsProperties {
-      basePath = basePath == null ? "" : basePath;
-    }
+  /** Binds {@code aerius.endpoints.*} (public API path prefix for links and, via bridge, generated controllers). */
+  @ConfigurationProperties(prefix = "aerius.endpoints")
+  public record EndpointsProperties(@DefaultValue("") String basePath) {
   }
 }

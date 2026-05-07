@@ -31,8 +31,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableConfigurationProperties(AsyncConfig.AsyncProperties.class)
 public class AsyncConfig {
 
-  @Bean(name = "requestExecutor")
-  public Executor requestExecutor(AsyncProperties properties) {
+  @Bean
+  public Executor requestExecutor(final AsyncProperties properties) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(properties.corePoolSize());
@@ -46,7 +46,7 @@ public class AsyncConfig {
     return executor;
   }
 
-  @ConfigurationProperties(prefix = "app.async")
+  @ConfigurationProperties(prefix = "aerius.async")
   public record AsyncProperties(
       int corePoolSize,
       int maxPoolSize,
