@@ -20,5 +20,5 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ResultType(
-    @NotNull(message = "resultTypeId is required") Short resultTypeId,
+    @NotNull(message = "resultTypeId is required") short resultTypeId,
     @NotBlank(message = "name is required") String name) {}

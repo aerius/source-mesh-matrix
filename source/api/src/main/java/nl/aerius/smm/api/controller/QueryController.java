@@ -56,7 +56,7 @@ public class QueryController implements QueryApiDelegate {
   }
 
   @Override
-  public ResponseEntity<RestMatrixQueryStatusResponse> createMatrixQuery(RestMatrixQueryRequest restMatrixQueryRequest) {
+  public ResponseEntity<RestMatrixQueryStatusResponse> createMatrixQuery(final RestMatrixQueryRequest restMatrixQueryRequest) {
     final QueryRequest request = queryRequestMapper.toQueryRequest(restMatrixQueryRequest);
     queryRequestValidator.validateComplete(request);
     final UUID queryId = queryProcessingService.create(request);
@@ -70,13 +70,13 @@ public class QueryController implements QueryApiDelegate {
   }
 
   @Override
-  public ResponseEntity<RestMatrixQueryResultResponse> getMatrixQueryResult(UUID queryId) {
+  public ResponseEntity<RestMatrixQueryResultResponse> getMatrixQueryResult(final UUID queryId) {
     final QueryResultResponse result = queryProcessingService.getResult(queryId);
     return ResponseEntity.ok(queryResultMapper.toRestMatrixQueryResultResponse(result));
   }
 
   @Override
-  public ResponseEntity<RestMatrixQueryStatusResponse> getMatrixQueryStatus(UUID queryId) {
+  public ResponseEntity<RestMatrixQueryStatusResponse> getMatrixQueryStatus(final UUID queryId) {
     final QueryStatus status = queryProcessingService.getStatus(queryId);
     return ResponseEntity
         .ok()

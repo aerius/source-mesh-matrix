@@ -27,26 +27,15 @@ import nl.aerius.smm.api.model.Substance;
 @Service
 public class CatalogService {
 
-  private static final List<CalculationVersion> CALCULATION_VERSIONS = List.of(
-      new CalculationVersion((short) 1, "v1"));
-
-  private static final List<Substance> SUBSTANCES = List.of(
-      new Substance((short) 1, "NOx"),
-      new Substance((short) 2, "NH3"));
-
-  private static final List<ResultType> RESULT_TYPES = List.of(
-      new ResultType((short) 1, "concentration"),
-      new ResultType((short) 2, "deposition"));
-
   public List<CalculationVersion> getCalculationVersions() {
-    return CALCULATION_VERSIONS;
+    return null;
   }
 
   public List<Substance> getSubstances() {
-    return SUBSTANCES;
+    return null;
   }
 
   public List<ResultType> getResultTypes() {
-    return RESULT_TYPES;
+    return null;
   }
 }

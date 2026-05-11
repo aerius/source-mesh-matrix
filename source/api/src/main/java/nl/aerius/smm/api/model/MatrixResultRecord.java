@@ -25,4 +25,4 @@ public record MatrixResultRecord(
     @NotNull(message = "meshPoint is required") @Valid Point meshPoint,
     @NotBlank(message = "substance is required") String substance,
     @NotBlank(message = "resultType is required") String resultType,
-    @NotNull(message = "value is required") Double value) {}
+    @NotNull(message = "value is required") double value) {}

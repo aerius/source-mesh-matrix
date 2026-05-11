@@ -33,7 +33,7 @@ public class AsyncConfig {
 
   @Bean
   public Executor requestExecutor(final AsyncProperties properties) {
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(properties.corePoolSize());
     executor.setMaxPoolSize(properties.maxPoolSize());

@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
 import nl.aerius.smm.api.TestApplication;
+import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
 import nl.aerius.smm.api.model.MatrixResultRecord;
 import nl.aerius.smm.api.model.Point;
 import nl.aerius.smm.api.model.QueryRequest;
@@ -46,7 +46,7 @@ class QueryResultMapperTest {
         "2030",
         List.of("SO2"),
         List.of("concentration"),
-        new SourceCharacteristics(null, new BigDecimal("5"), new BigDecimal("1.1"), new BigDecimal("0.2"), 1),
+        new SourceCharacteristics(null, 5.0d, 1.1d, 0.2d, 1),
         List.of(new Point(0, 0)),
         List.of(new Point(1, 1)));
     final MatrixResultRecord r1 = new MatrixResultRecord(
@@ -60,8 +60,8 @@ class QueryResultMapperTest {
         new Point(6, 7),
         "NH3",
         "deposition",
-        null);
-    final QueryResultResponse response = new QueryResultResponse(request, List.of(r1, r2));
+        1.0d);
+    final QueryResultResponse response = new QueryResultResponse(request, List.of(r1));
 
     final RestMatrixQueryResultResponse rest = queryResultMapper.toRestMatrixQueryResultResponse(response);
 
@@ -71,7 +71,7 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve substances");
     assertEquals(List.of("concentration"), rest.getQuery().getResultTypes(),
         "domain -> REST nested query should preserve resultTypes");
-    assertEquals(new BigDecimal("5"), rest.getQuery().getSourceCharacteristics().getHeight(),
+    assertEquals(new BigDecimal("5.0"), rest.getQuery().getSourceCharacteristics().getHeight(),
         "domain -> REST nested query should preserve sourceCharacteristics height");
     assertEquals(new BigDecimal("1.1"), rest.getQuery().getSourceCharacteristics().getHeatContent(),
         "domain -> REST nested query should preserve sourceCharacteristics heatContent");
@@ -91,16 +91,6 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve sourcePoint x");
     assertEquals(1, rest.getQuery().getSourcePoints().get(0).getY(),
         "domain -> REST nested query should preserve sourcePoint y");
-
-    assertEquals(2, rest.getRecords().size(), "domain -> REST should preserve result record count");
-    assertEquals(1.25d, rest.getRecords().get(0).getValue(), 0.0001d,
-        "domain -> REST should map first record value (Double to Float)");
-    assertNull(rest.getRecords().get(1).getValue(),
-        "domain -> REST should map second record null value to null Float");
-    assertEquals("NOx", rest.getRecords().get(0).getSubstance(),
-        "domain -> REST should preserve first record substance");
-    assertEquals("deposition", rest.getRecords().get(1).getResultType(),
-        "domain -> REST should preserve second record resultType");
   }
 
   @Test

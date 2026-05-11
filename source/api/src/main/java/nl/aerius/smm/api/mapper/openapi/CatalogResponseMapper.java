@@ -16,8 +16,8 @@
  */
 package nl.aerius.smm.api.mapper.openapi;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.mapstruct.Mapper;
 
@@ -31,30 +31,35 @@ import nl.aerius.smm.api.model.Substance;
 @Mapper(componentModel = "spring")
 public interface CatalogResponseMapper {
 
-  default RestCalculationVersionCatalogResponse toRestCalculationVersionCatalogResponse(
-      final List<CalculationVersion> calculationVersions) {
-    final RestCalculationVersionCatalogResponse response = new RestCalculationVersionCatalogResponse();
-    final List<String> names = calculationVersions == null ? Collections.emptyList() : mapCalculationVersionNames(calculationVersions);
-    response.setCalculationVersions(names);
-    return response;
+  default RestCalculationVersionCatalogResponse toRestCalculationVersionCatalogResponse(final List<CalculationVersion> calculationVersions) {
+    return new RestCalculationVersionCatalogResponse()
+        .calculationVersions(
+            Optional.ofNullable(calculationVersions)
+                .map(this::mapCalculationVersionNames)
+                .orElseGet(List::of)
+        );
   }
 
   List<String> mapCalculationVersionNames(List<CalculationVersion> calculationVersions);
 
   default RestSubstanceCatalogResponse toRestSubstanceCatalogResponse(final List<Substance> substances) {
-    final RestSubstanceCatalogResponse response = new RestSubstanceCatalogResponse();
-    final List<String> names = substances == null ? Collections.emptyList() : mapSubstanceNames(substances);
-    response.setSubstances(names);
-    return response;
+    return new RestSubstanceCatalogResponse()
+        .substances(
+            Optional.ofNullable(substances)
+                .map(this::mapSubstanceNames)
+                .orElseGet(List::of)
+        );
   }
 
   List<String> mapSubstanceNames(List<Substance> substances);
 
   default RestResultTypeCatalogResponse toRestResultTypeCatalogResponse(final List<ResultType> resultTypes) {
-    final RestResultTypeCatalogResponse response = new RestResultTypeCatalogResponse();
-    final List<String> names = resultTypes == null ? Collections.emptyList() : mapResultTypeNames(resultTypes);
-    response.setResultTypes(names);
-    return response;
+    return new RestResultTypeCatalogResponse()
+        .resultTypes(
+            Optional.ofNullable(resultTypes)
+                .map(this::mapResultTypeNames)
+                .orElseGet(List::of)
+        );
   }
 
   List<String> mapResultTypeNames(List<ResultType> resultTypes);

@@ -105,8 +105,8 @@ class QueryControllerMvcTest {
     when(queryTaskMapper.toRestMatrixQueryStatusResponse(queryId, QueryStatus.ACCEPTED)).thenReturn(body);
 
     final MvcResult res = mockMvc.perform(post(BASE + QueryApi.PATH_CREATE_MATRIX_QUERY)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(restSampleRequest())))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(restSampleRequest())))
         .andReturn();
 
     assertEquals(HttpStatus.ACCEPTED.value(), res.getResponse().getStatus(),
@@ -210,8 +210,8 @@ class QueryControllerMvcTest {
     when(queryProcessingService.create(domainRequest)).thenThrow(new QueueFullException(queryId));
 
     final MvcResult res = mockMvc.perform(post(BASE + QueryApi.PATH_CREATE_MATRIX_QUERY)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(restSampleRequest())))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(restSampleRequest())))
         .andReturn();
 
     assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), res.getResponse().getStatus(),
@@ -229,8 +229,8 @@ class QueryControllerMvcTest {
     doThrow(new IllegalArgumentException("meshPoints invalid")).when(queryRequestValidator).validateComplete(domainRequest);
 
     final MvcResult res = mockMvc.perform(post(BASE + QueryApi.PATH_CREATE_MATRIX_QUERY)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(restSampleRequest())))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(restSampleRequest())))
         .andReturn();
 
     assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus(),
@@ -247,7 +247,7 @@ class QueryControllerMvcTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new nl.aerius.smm.api.model.SourceCharacteristics(null, BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(2), 1),
+        new nl.aerius.smm.api.model.SourceCharacteristics(null, 1d, 10d, 2d, 1),
         List.of(new Point(1, 2)),
         List.of(new Point(3, 4)));
   }

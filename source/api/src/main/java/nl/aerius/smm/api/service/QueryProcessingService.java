@@ -42,92 +42,92 @@ import nl.aerius.smm.api.model.QueryTask;
 
 @Service
 public class QueryProcessingService {
-    private static final Logger LOG = LoggerFactory.getLogger(QueryProcessingService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(QueryProcessingService.class);
 
-    private final Map<UUID, QueryTask> queue = new ConcurrentHashMap<>();
-    private final Executor requestExecutor;
-    private final MatrixService matrixService;
+  private final Map<UUID, QueryTask> tasks = new ConcurrentHashMap<>();
+  private final Executor requestExecutor;
+  private final MatrixService matrixService;
 
-    public QueryProcessingService(@Qualifier("requestExecutor") final Executor requestExecutor, final MatrixService matrixService) {
-        this.requestExecutor = requestExecutor;
-        this.matrixService = matrixService;
+  public QueryProcessingService(@Qualifier("requestExecutor") final Executor requestExecutor, final MatrixService matrixService) {
+    this.requestExecutor = requestExecutor;
+    this.matrixService = matrixService;
+  }
+
+  public UUID create(final QueryRequest request) {
+    final QueryTask task = QueryTask.create(request);
+
+    // Add trace ID
+    MDC.put("taskId", task.id().toString());
+
+    tasks.put(task.id(), task);
+    updateTaskInQueue(task.id(), QueryTask::accepted);
+
+    try {
+      requestExecutor.execute(() -> process(task));
+    } catch (final TaskRejectedException e) {
+      updateTaskInQueue(task.id(), QueryTask::rejected);
+      throw new QueueFullException(task.id());
     }
 
-    public UUID create(final QueryRequest request) {
-        QueryTask task = QueryTask.create(request);
+    return task.id();
+  }
 
-        // Add trace ID
-        MDC.put("taskId", task.id().toString());
-
-        queue.put(task.id(), task);
-        updateTaskInQueue(task.id(), QueryTask::accepted);
-
-        try {
-            requestExecutor.execute(() -> process(task));
-        } catch (TaskRejectedException e) {
-            updateTaskInQueue(task.id(), QueryTask::rejected);
-            throw new QueueFullException(task.id());
-        }
-
-        return task.id();
+  public QueryStatus getStatus(final UUID id) {
+    final QueryTask task = tasks.get(id);
+    if (task == null) {
+      throw new TaskNotFoundException(id);
     }
+    return task.status();
+  }
 
-    public QueryStatus getStatus(final UUID id) {
-        QueryTask task = queue.get(id);
-        if (task == null) {
-            throw new TaskNotFoundException(id);
-        }
-        return task.status();
+  public QueryResultResponse getResult(final UUID id) {
+    final AtomicReference<QueryTask> popped = new AtomicReference<>();
+
+    tasks.compute(id, (key, existing) -> {
+      if (existing == null) {
+        throw new TaskNotFoundException(id);
+      }
+      if (existing.status() != QueryStatus.COMPLETED) {
+        throw new ResultNotReadyException(id, existing.status());
+      }
+
+      popped.set(existing);
+
+      // remove from tasks list
+      return null;
+    });
+
+    return new QueryResultResponse(popped.get().request(), popped.get().results());
+  }
+
+  private void process(final QueryTask task) {
+    updateTaskInQueue(task.id(), QueryTask::processing);
+
+    try {
+      final List<MatrixResultRecord> result = matrixService.fetchMatrixResults(task.request());
+      updateTaskInQueue(task.id(), currentTask -> currentTask.complete(result));
+    } catch (final Exception e) {
+      LOG.error("Async task failed while computing result: taskId={}", task.id(), e);
+      updateTaskInQueue(task.id(), QueryTask::failed);
     }
+  }
 
-    public QueryResultResponse getResult(final UUID id) {
-        AtomicReference<QueryTask> popped = new AtomicReference<>();
+  /** Thread-Safe method for updating the tasks in the queue. */
+  private void updateTaskInQueue(final UUID id, final UnaryOperator<QueryTask> updater) {
+    tasks.compute(id, (k, oldTask) -> {
+      if (oldTask == null) {
+        throw new IllegalArgumentException("Task not found: " + id);
+      }
 
-        queue.compute(id, (key, existing) -> {
-            if (existing == null) {
-                throw new TaskNotFoundException(id);
-            }
-            if (existing.status() != QueryStatus.COMPLETED) {
-                throw new ResultNotReadyException(id, existing.status());
-            }
+      final QueryTask newTask = updater.apply(oldTask);
 
-            popped.set(existing);
+      LOG.debug("Async task status changed: taskId={}, from={}, to={}",
+          id,
+          oldTask.status(),
+          newTask.status());
 
-            // remove from queue
-            return null;
-        });
-
-        return new QueryResultResponse(popped.get().request(), popped.get().results());
-    }
-
-    private void process(final QueryTask task) {
-        updateTaskInQueue(task.id(), QueryTask::processing);
-
-        try {
-            List<MatrixResultRecord> result = matrixService.fetchMatrixResults(task.request());
-            updateTaskInQueue(task.id(), currentTask -> currentTask.complete(result));
-        } catch (Exception e) {
-            LOG.error("Async task failed while computing result: taskId={}", task.id(), e);
-            updateTaskInQueue(task.id(), QueryTask::failed);
-        }
-    }
-
-    /** Thread-Safe method for updating the tasks in the queue. */
-    private void updateTaskInQueue(UUID id, UnaryOperator<QueryTask> updater) {
-        queue.compute(id, (k, oldTask) -> {
-            if (oldTask == null) {
-                throw new IllegalArgumentException("Task not found: " + id);
-            }
-
-            QueryTask newTask = updater.apply(oldTask);
-
-            LOG.debug("Async task status changed: taskId={}, from={}, to={}",
-                id,
-                oldTask.status(),
-                newTask.status());
-
-            return newTask;
-        });
-    }
+      return newTask;
+    });
+  }
 }
 

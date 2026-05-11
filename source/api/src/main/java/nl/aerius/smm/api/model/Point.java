@@ -19,5 +19,5 @@ package nl.aerius.smm.api.model;
 import jakarta.validation.constraints.NotNull;
 
 public record Point(
-    @NotNull(message = "x is required") Integer x,
-    @NotNull(message = "y is required") Integer y) {}
+    @NotNull(message = "x is required") int x,
+    @NotNull(message = "y is required") int y) {}

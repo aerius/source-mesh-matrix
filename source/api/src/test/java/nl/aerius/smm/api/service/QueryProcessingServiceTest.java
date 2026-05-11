@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -114,7 +113,7 @@ class QueryProcessingServiceTest {
         "ResultNotReadyException -> should expose current task status ACCEPTED");
 
     when(matrixService.fetchMatrixResults(any())).thenReturn(List.of(sampleRecord()));
-    pending.get(0).run();
+    pending.getFirst().run();
     assertEquals(QueryStatus.COMPLETED, service.getStatus(id),
         "after queued runnable runs -> getStatus should return COMPLETED");
   }
@@ -150,7 +149,7 @@ class QueryProcessingServiceTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new SourceCharacteristics(null, BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(2), 1),
+        new SourceCharacteristics(null, 1d, 10d, 2d, 1),
         List.of(new Point(1, 2)),
         List.of(new Point(3, 4)));
   }

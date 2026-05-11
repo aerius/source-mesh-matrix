@@ -16,12 +16,13 @@
  */
 package nl.aerius.smm.api.validation;
 
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+
+import org.springframework.stereotype.Component;
 
 import nl.aerius.smm.api.model.QueryRequest;
 
@@ -38,7 +39,7 @@ public class QueryRequestValidator {
     if (request == null) {
       throw new IllegalArgumentException("request is required");
     }
-    final var violations = validator.validate(request);
+    final Set<ConstraintViolation<QueryRequest>> violations = validator.validate(request);
     if (!violations.isEmpty()) {
       final String message = violations.stream()
           .map(ConstraintViolation::getMessage)

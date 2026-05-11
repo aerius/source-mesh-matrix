@@ -16,14 +16,12 @@
  */
 package nl.aerius.smm.api.model;
 
-import java.math.BigDecimal;
-
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 public record SourceCharacteristics(
     @Nullable Short sourceCharacteristicId,
-    @NotNull(message = "height is required") BigDecimal height,
-    @NotNull(message = "heatContent is required") BigDecimal heatContent,
-    @NotNull(message = "spread is required") BigDecimal spread,
-    @NotNull(message = "emission diurnal variation is required") Integer emissionDiurnalVariation) {}
+    @NotNull(message = "height is required") double height,
+    @NotNull(message = "heatContent is required") double heatContent,
+    @NotNull(message = "spread is required") double spread,
+    @NotNull(message = "emission diurnal variation is required") int emissionDiurnalVariation) {}

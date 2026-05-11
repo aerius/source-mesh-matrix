@@ -19,15 +19,14 @@ package nl.aerius.smm.api.mapper.openapi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryRequest;
 import nl.aerius.smm.api.TestApplication;
+import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryRequest;
 import nl.aerius.smm.api.model.Point;
 import nl.aerius.smm.api.model.QueryRequest;
 import nl.aerius.smm.api.model.SourceCharacteristics;
@@ -88,9 +87,9 @@ class QueryRequestMapperTest {
   private static QueryRequest sampleQueryRequest() {
     final SourceCharacteristics sourceCharacteristics = new SourceCharacteristics(
         (short) 99,
-        new BigDecimal("15.5"),
-        new BigDecimal("2.25"),
-        new BigDecimal("0.75"),
+        15.5d,
+        2.25d,
+        0.75d,
         3);
     return new QueryRequest(
         "2024",

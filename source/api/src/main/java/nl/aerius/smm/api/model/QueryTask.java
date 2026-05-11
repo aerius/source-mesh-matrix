@@ -60,7 +60,7 @@ public record QueryTask(
     return withStatus(QueryStatus.FAILED);
   }
 
-  private QueryTask withStatus(QueryStatus status) {
+  private QueryTask withStatus(final QueryStatus status) {
     return new QueryTask(id, request, status, results);
   }
 }

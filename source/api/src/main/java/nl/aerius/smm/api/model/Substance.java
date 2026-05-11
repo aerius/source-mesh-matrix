@@ -20,5 +20,5 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record Substance(
-    @NotNull(message = "substanceId is required") Short substanceId,
+    @NotNull(message = "substanceId is required") short substanceId,
     @NotBlank(message = "name is required") String name) {}
