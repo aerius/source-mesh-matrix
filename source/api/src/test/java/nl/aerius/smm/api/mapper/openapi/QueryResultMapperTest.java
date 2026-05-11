@@ -19,7 +19,6 @@ package nl.aerius.smm.api.mapper.openapi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -71,11 +70,11 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve substances");
     assertEquals(List.of("concentration"), rest.getQuery().getResultTypes(),
         "domain -> REST nested query should preserve resultTypes");
-    assertEquals(new BigDecimal("5.0"), rest.getQuery().getSourceCharacteristics().getHeight(),
+    assertEquals(5.0d, rest.getQuery().getSourceCharacteristics().getHeight(),
         "domain -> REST nested query should preserve sourceCharacteristics height");
-    assertEquals(new BigDecimal("1.1"), rest.getQuery().getSourceCharacteristics().getHeatContent(),
+    assertEquals(1.1d, rest.getQuery().getSourceCharacteristics().getHeatContent(),
         "domain -> REST nested query should preserve sourceCharacteristics heatContent");
-    assertEquals(new BigDecimal("0.2"), rest.getQuery().getSourceCharacteristics().getSpread(),
+    assertEquals(0.2d, rest.getQuery().getSourceCharacteristics().getSpread(),
         "domain -> REST nested query should preserve sourceCharacteristics spread");
     assertEquals(1, rest.getQuery().getSourceCharacteristics().getEmissionDiurnalVariation(),
         "domain -> REST nested query should preserve sourceCharacteristics emissionDiurnalVariation");

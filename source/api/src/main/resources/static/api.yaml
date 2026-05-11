@@ -341,12 +341,15 @@ components:
             height:
               description: Query by source height
               type: number
+              format: double
             heat_content:
               description: Query by heat content
               type: number
+              format: double
             spread:
               description: Query by spread
               type: number
+              format: double
             emission_diurnal_variation:
               description: Query by emission diurnal variation ID
               type: integer

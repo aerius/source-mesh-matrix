@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
@@ -257,7 +256,7 @@ class QueryControllerMvcTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new RestSourceCharacteristics(BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(2), 1),
+        new RestSourceCharacteristics(1d, 10d, 2d, 1),
         List.of(new RestPoint(1, 2)),
         List.of(new RestPoint(3, 4)));
   }
