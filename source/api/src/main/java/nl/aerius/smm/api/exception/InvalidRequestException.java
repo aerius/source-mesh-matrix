@@ -16,24 +16,19 @@
  */
 package nl.aerius.smm.api.exception;
 
-import nl.aerius.smm.api.model.QueryStatus;
+public final class InvalidRequestException extends RuntimeException {
 
-public class ResultNotReadyException extends RuntimeException {
+  public static final String INVALID_QUERY_ID = "INVALID_QUERY_ID";
+  public static final String INVALID_QUERY_REQUEST = "INVALID_QUERY_REQUEST";
 
-  private final String taskId;
-  private final QueryStatus status;
+  private final String code;
 
-  public ResultNotReadyException(final String taskId, final QueryStatus status) {
-    super("Query result not ready for task " + taskId + " with status " + status);
-    this.taskId = taskId;
-    this.status = status;
+  public InvalidRequestException(final String code, final String message) {
+    super(message);
+    this.code = code;
   }
 
-  public String getTaskId() {
-    return taskId;
-  }
-
-  public QueryStatus getStatus() {
-    return status;
+  public String getCode() {
+    return code;
   }
 }

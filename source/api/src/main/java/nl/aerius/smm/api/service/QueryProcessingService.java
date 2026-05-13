@@ -18,7 +18,6 @@ package nl.aerius.smm.api.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,7 +43,7 @@ import nl.aerius.smm.api.model.QueryTask;
 public class QueryProcessingService {
   private static final Logger LOG = LoggerFactory.getLogger(QueryProcessingService.class);
 
-  private final Map<UUID, QueryTask> tasks = new ConcurrentHashMap<>();
+  private final Map<String, QueryTask> tasks = new ConcurrentHashMap<>();
   private final Executor requestExecutor;
   private final MatrixService matrixService;
 
@@ -53,7 +52,7 @@ public class QueryProcessingService {
     this.matrixService = matrixService;
   }
 
-  public UUID create(final QueryRequest request) {
+  public String create(final QueryRequest request) {
     final QueryTask task = QueryTask.create(request);
 
     // Add trace ID
@@ -72,7 +71,7 @@ public class QueryProcessingService {
     return task.id();
   }
 
-  public QueryStatus getStatus(final UUID id) {
+  public QueryStatus getStatus(final String id) {
     final QueryTask task = tasks.get(id);
     if (task == null) {
       throw new TaskNotFoundException(id);
@@ -80,7 +79,7 @@ public class QueryProcessingService {
     return task.status();
   }
 
-  public QueryResultResponse getResult(final UUID id) {
+  public QueryResultResponse getResult(final String id) {
     final AtomicReference<QueryTask> popped = new AtomicReference<>();
 
     tasks.compute(id, (key, existing) -> {
@@ -113,7 +112,7 @@ public class QueryProcessingService {
   }
 
   /** Thread-Safe method for updating the tasks in the queue. */
-  private void updateTaskInQueue(final UUID id, final UnaryOperator<QueryTask> updater) {
+  private void updateTaskInQueue(final String id, final UnaryOperator<QueryTask> updater) {
     tasks.compute(id, (k, oldTask) -> {
       if (oldTask == null) {
         throw new IllegalArgumentException("Task not found: " + id);

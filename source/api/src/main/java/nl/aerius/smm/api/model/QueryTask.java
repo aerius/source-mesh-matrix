@@ -21,7 +21,7 @@ import java.util.UUID;
 
 /** Tracks one asynchronous matrix query. */
 public record QueryTask(
-    UUID id,
+    String id,
     QueryRequest request,
     QueryStatus status,
     List<MatrixResultRecord> results
@@ -29,7 +29,7 @@ public record QueryTask(
   /** Create task. TaskId will be generated and status is set to null. */
   public static QueryTask create(final QueryRequest request) {
     return new QueryTask(
-        UUID.randomUUID(),
+        UUID.randomUUID().toString(),
         request,
         null,
         null);

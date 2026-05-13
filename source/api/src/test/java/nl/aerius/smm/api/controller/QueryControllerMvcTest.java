@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nl.aerius.smm.api.exception.InvalidRequestException;
 import nl.aerius.smm.api.exception.QueueFullException;
 import nl.aerius.smm.api.exception.ResultNotReadyException;
 import nl.aerius.smm.api.exception.TaskNotFoundException;
@@ -59,10 +59,11 @@ import nl.aerius.smm.api.model.QueryRequest;
 import nl.aerius.smm.api.model.QueryResultResponse;
 import nl.aerius.smm.api.model.QueryStatus;
 import nl.aerius.smm.api.service.QueryProcessingService;
+import nl.aerius.smm.api.validation.QueryIdValidator;
 import nl.aerius.smm.api.validation.QueryRequestValidator;
 
 @WebMvcTest(controllers = QueryApiController.class)
-@Import(QueryController.class)
+@Import({ QueryController.class, QueryIdValidator.class })
 class QueryControllerMvcTest {
 
   private static final String BASE = "/api/v1";
@@ -88,8 +89,21 @@ class QueryControllerMvcTest {
   private QueryRequestValidator queryRequestValidator;
 
   @Test
+  void testGetStatusInvalidQueryIdPath() throws Exception {
+    final MvcResult res = mockMvc.perform(get(BASE + "/matrix/queries/{queryId}", "bad_id"))
+        .andReturn();
+
+    assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus(),
+        "GET /matrix/queries/{id} with invalid queryId -> should return 400 Bad Request");
+    final JsonNode json = objectMapper.readTree(res.getResponse().getContentAsString(StandardCharsets.UTF_8));
+    assertEquals("INVALID_QUERY_ID", json.get("code").asText());
+    assertEquals(true, json.get("message").asText().contains("queryId"),
+        "invalid queryId -> JSON message should describe queryId rules");
+  }
+
+  @Test
   void testPostAccepted() throws Exception {
-    final UUID queryId = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+    final String queryId = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
     final QueryRequest domainRequest = domainSampleRequest();
     final RestMatrixQueryStatusResponse body = RestMatrixQueryStatusResponse.builder()
         .queryId(queryId)
@@ -113,7 +127,7 @@ class QueryControllerMvcTest {
     assertEquals(BASE + "/matrix/queries/" + queryId, res.getResponse().getHeader("Location"),
         "POST /matrix/queries -> Location should reference the query status URL");
     final JsonNode json = objectMapper.readTree(res.getResponse().getContentAsString(StandardCharsets.UTF_8));
-    assertEquals(queryId.toString(), json.get("queryId").asText(),
+    assertEquals(queryId, json.get("queryId").asText(),
         "POST /matrix/queries -> JSON body should preserve queryId");
     assertEquals("Processing", json.get("status").asText(),
         "POST /matrix/queries -> JSON body should expose REST status Processing");
@@ -121,7 +135,7 @@ class QueryControllerMvcTest {
 
   @Test
   void testGetStatusOk() throws Exception {
-    final UUID queryId = UUID.fromString("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22");
+    final String queryId = "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22";
     final RestMatrixQueryStatusResponse body = RestMatrixQueryStatusResponse.builder()
         .queryId(queryId)
         .status(RestMatrixQueryStatusResponse.StatusEnum.COMPLETED)
@@ -138,7 +152,7 @@ class QueryControllerMvcTest {
     assertEquals(HttpStatus.OK.value(), res.getResponse().getStatus(),
         "GET /matrix/queries/{id} -> response status should be 200 OK");
     final JsonNode json = objectMapper.readTree(res.getResponse().getContentAsString(StandardCharsets.UTF_8));
-    assertEquals(queryId.toString(), json.get("queryId").asText(),
+    assertEquals(queryId, json.get("queryId").asText(),
         "GET /matrix/queries/{id} -> JSON body should preserve queryId");
     assertEquals("Completed", json.get("status").asText(),
         "GET /matrix/queries/{id} -> JSON body should expose REST status Completed");
@@ -146,7 +160,7 @@ class QueryControllerMvcTest {
 
   @Test
   void testGetResultOk() throws Exception {
-    final UUID queryId = UUID.fromString("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33");
+    final String queryId = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33";
     final QueryResultResponse domainResult = new QueryResultResponse(domainSampleRequest(), List.of());
     final RestMatrixQueryResultResponse rest = new RestMatrixQueryResultResponse();
 
@@ -162,7 +176,7 @@ class QueryControllerMvcTest {
 
   @Test
   void testGetStatusMissing() throws Exception {
-    final UUID queryId = UUID.fromString("d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44");
+    final String queryId = "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44";
     when(queryProcessingService.getStatus(queryId)).thenThrow(new TaskNotFoundException(queryId));
 
     final MvcResult res = mockMvc.perform(get(BASE + "/matrix/queries/{queryId}", queryId))
@@ -179,7 +193,7 @@ class QueryControllerMvcTest {
 
   @Test
   void testGetResultPending() throws Exception {
-    final UUID queryId = UUID.fromString("e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55");
+    final String queryId = "e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55";
     final RestMatrixQueryStatusResponse body = RestMatrixQueryStatusResponse.builder()
         .queryId(queryId)
         .status(RestMatrixQueryStatusResponse.StatusEnum.PROCESSING)
@@ -195,13 +209,13 @@ class QueryControllerMvcTest {
     assertEquals(HttpStatus.ACCEPTED.value(), res.getResponse().getStatus(),
         "GET /matrix/queries/{id}/result when not ready -> should return 202 Accepted");
     final JsonNode json = objectMapper.readTree(res.getResponse().getContentAsString(StandardCharsets.UTF_8));
-    assertEquals(queryId.toString(), json.get("queryId").asText(),
+    assertEquals(queryId, json.get("queryId").asText(),
         "ResultNotReadyException -> JSON body should preserve queryId from status payload");
   }
 
   @Test
   void testPostQueueFull() throws Exception {
-    final UUID queryId = UUID.fromString("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66");
+    final String queryId = "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66";
     final QueryRequest domainRequest = domainSampleRequest();
 
     when(queryRequestMapper.toQueryRequest(any(RestMatrixQueryRequest.class))).thenReturn(domainRequest);
@@ -225,7 +239,8 @@ class QueryControllerMvcTest {
     final QueryRequest domainRequest = domainSampleRequest();
 
     when(queryRequestMapper.toQueryRequest(any(RestMatrixQueryRequest.class))).thenReturn(domainRequest);
-    doThrow(new IllegalArgumentException("meshPoints invalid")).when(queryRequestValidator).validateComplete(domainRequest);
+    doThrow(new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, "meshPoints invalid"))
+        .when(queryRequestValidator).validateComplete(domainRequest);
 
     final MvcResult res = mockMvc.perform(post(BASE + QueryApi.PATH_CREATE_MATRIX_QUERY)
             .contentType(MediaType.APPLICATION_JSON)

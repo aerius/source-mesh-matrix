@@ -25,28 +25,28 @@ import jakarta.validation.Validator;
 import org.springframework.stereotype.Component;
 
 import nl.aerius.smm.api.exception.InvalidRequestException;
-import nl.aerius.smm.api.model.QueryRequest;
+import nl.aerius.smm.api.model.QueryId;
 
 @Component
-public class QueryRequestValidator {
+public class QueryIdValidator {
 
   private final Validator validator;
 
-  public QueryRequestValidator(final Validator validator) {
+  public QueryIdValidator(final Validator validator) {
     this.validator = validator;
   }
 
-  public void validateComplete(final QueryRequest request) {
-    if (request == null) {
-      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, "request is required");
+  public void validateQueryId(final String queryId) {
+    if (queryId == null) {
+      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_ID, "queryId is required");
     }
-    final Set<ConstraintViolation<QueryRequest>> violations = validator.validate(request);
+    final Set<ConstraintViolation<QueryId>> violations = validator.validate(new QueryId(queryId));
     if (!violations.isEmpty()) {
       final String message = violations.stream()
           .map(ConstraintViolation::getMessage)
           .sorted()
           .collect(Collectors.joining("; "));
-      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, message);
+      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_ID, message);
     }
   }
 }

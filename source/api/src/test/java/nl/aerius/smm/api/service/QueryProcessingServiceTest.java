@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +63,7 @@ class QueryProcessingServiceTest {
     final List<MatrixResultRecord> results = List.of(sampleRecord());
     when(matrixService.fetchMatrixResults(any())).thenReturn(results);
 
-    final UUID id = service.create(request);
+    final String id = service.create(request);
 
     assertEquals(QueryStatus.COMPLETED, service.getStatus(id),
         "create with sync executor -> getStatus should return COMPLETED");
@@ -87,13 +86,13 @@ class QueryProcessingServiceTest {
 
   @Test
   void testStatusMissing() {
-    assertThrows(TaskNotFoundException.class, () -> service.getStatus(UUID.randomUUID()),
+    assertThrows(TaskNotFoundException.class, () -> service.getStatus("00000000-0000-0000-0000-000000000099"),
         "unknown task id -> getStatus should throw TaskNotFoundException");
   }
 
   @Test
   void testResultMissing() {
-    assertThrows(TaskNotFoundException.class, () -> service.getResult(UUID.randomUUID()),
+    assertThrows(TaskNotFoundException.class, () -> service.getResult("00000000-0000-0000-0000-000000000099"),
         "unknown task id -> getResult should throw TaskNotFoundException");
   }
 
@@ -103,7 +102,7 @@ class QueryProcessingServiceTest {
     final Executor deferred = pending::add;
     service = new QueryProcessingService(deferred, matrixService);
 
-    final UUID id = service.create(sampleRequest());
+    final String id = service.create(sampleRequest());
 
     final ResultNotReadyException notReady = assertThrows(
         ResultNotReadyException.class,
@@ -129,7 +128,7 @@ class QueryProcessingServiceTest {
         QueueFullException.class,
         () -> service.create(sampleRequest()),
         "executor rejects submission -> create should throw QueueFullException");
-    final UUID taskId = qf.getTaskId();
+    final String taskId = qf.getTaskId();
     assertEquals(QueryStatus.REJECTED, service.getStatus(taskId),
         "queue full -> task should remain REJECTED in queue");
   }
@@ -138,7 +137,7 @@ class QueryProcessingServiceTest {
   void testMatrixErrorFailed() {
     when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
 
-    final UUID id = service.create(sampleRequest());
+    final String id = service.create(sampleRequest());
 
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "matrixService.fetchMatrixResults throws -> task should end FAILED");

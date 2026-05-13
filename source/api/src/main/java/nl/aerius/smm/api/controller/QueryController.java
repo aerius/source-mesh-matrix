@@ -16,8 +16,6 @@
  */
 package nl.aerius.smm.api.controller;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +31,7 @@ import nl.aerius.smm.api.model.QueryRequest;
 import nl.aerius.smm.api.model.QueryResultResponse;
 import nl.aerius.smm.api.model.QueryStatus;
 import nl.aerius.smm.api.service.QueryProcessingService;
+import nl.aerius.smm.api.validation.QueryIdValidator;
 import nl.aerius.smm.api.validation.QueryRequestValidator;
 
 @RestController
@@ -43,23 +42,25 @@ public class QueryController implements QueryApiDelegate {
   private final QueryResultMapper queryResultMapper;
   private final QueryTaskMapper queryTaskMapper;
   private final QueryRequestValidator queryRequestValidator;
+  private final QueryIdValidator queryIdValidator;
 
   @Autowired
   public QueryController(final QueryProcessingService queryProcessingService, final QueryRequestMapper queryRequestMapper,
       final QueryResultMapper queryResultMapper, final QueryTaskMapper queryTaskMapper,
-      final QueryRequestValidator queryRequestValidator) {
+      final QueryRequestValidator queryRequestValidator, final QueryIdValidator queryIdValidator) {
     this.queryProcessingService = queryProcessingService;
     this.queryRequestMapper = queryRequestMapper;
     this.queryResultMapper = queryResultMapper;
     this.queryTaskMapper = queryTaskMapper;
     this.queryRequestValidator = queryRequestValidator;
+    this.queryIdValidator = queryIdValidator;
   }
 
   @Override
   public ResponseEntity<RestMatrixQueryStatusResponse> createMatrixQuery(final RestMatrixQueryRequest restMatrixQueryRequest) {
     final QueryRequest request = queryRequestMapper.toQueryRequest(restMatrixQueryRequest);
     queryRequestValidator.validateComplete(request);
-    final UUID queryId = queryProcessingService.create(request);
+    final String queryId = queryProcessingService.create(request);
     final QueryStatus status = queryProcessingService.getStatus(queryId);
 
     final RestMatrixQueryStatusResponse response = queryTaskMapper.toRestMatrixQueryStatusResponse(queryId, status);
@@ -70,13 +71,15 @@ public class QueryController implements QueryApiDelegate {
   }
 
   @Override
-  public ResponseEntity<RestMatrixQueryResultResponse> getMatrixQueryResult(final UUID queryId) {
+  public ResponseEntity<RestMatrixQueryResultResponse> getMatrixQueryResult(final String queryId) {
+    queryIdValidator.validateQueryId(queryId);
     final QueryResultResponse result = queryProcessingService.getResult(queryId);
     return ResponseEntity.ok(queryResultMapper.toRestMatrixQueryResultResponse(result));
   }
 
   @Override
-  public ResponseEntity<RestMatrixQueryStatusResponse> getMatrixQueryStatus(final UUID queryId) {
+  public ResponseEntity<RestMatrixQueryStatusResponse> getMatrixQueryStatus(final String queryId) {
+    queryIdValidator.validateQueryId(queryId);
     final QueryStatus status = queryProcessingService.getStatus(queryId);
     return ResponseEntity
         .ok()

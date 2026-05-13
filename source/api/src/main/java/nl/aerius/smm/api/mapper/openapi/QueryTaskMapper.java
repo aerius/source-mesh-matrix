@@ -16,8 +16,6 @@
  */
 package nl.aerius.smm.api.mapper.openapi;
 
-import java.util.UUID;
-
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +29,7 @@ public abstract class QueryTaskMapper {
   @Autowired
   protected MatrixQueryResourceLinks matrixQueryResourceLinks;
 
-  public RestMatrixQueryStatusResponse toRestMatrixQueryStatusResponse(final UUID queryId, final QueryStatus status) {
+  public RestMatrixQueryStatusResponse toRestMatrixQueryStatusResponse(final String queryId, final QueryStatus status) {
     return RestMatrixQueryStatusResponse.builder()
         .queryId(queryId)
         .status(map(status))

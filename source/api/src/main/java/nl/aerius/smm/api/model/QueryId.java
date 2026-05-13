@@ -14,26 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.exception;
+package nl.aerius.smm.api.model;
 
-import nl.aerius.smm.api.model.QueryStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public class ResultNotReadyException extends RuntimeException {
-
-  private final String taskId;
-  private final QueryStatus status;
-
-  public ResultNotReadyException(final String taskId, final QueryStatus status) {
-    super("Query result not ready for task " + taskId + " with status " + status);
-    this.taskId = taskId;
-    this.status = status;
-  }
-
-  public String getTaskId() {
-    return taskId;
-  }
-
-  public QueryStatus getStatus() {
-    return status;
-  }
-}
+/** Domain model for a the queryId. Used for input validation. */
+public record QueryId(
+    @NotBlank(message = "queryId must not be blank")
+    @Size(max = 256, message = "queryId must be at most 256 characters")
+    @jakarta.validation.constraints.Pattern(
+        regexp = "^[A-Za-z0-9-]+$",
+        message = "queryId may only contain ASCII letters, digits, and dashes (a-z, A-Z, 0-9, -)")
+    String value
+) {}

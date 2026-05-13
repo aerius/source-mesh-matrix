@@ -16,18 +16,16 @@
  */
 package nl.aerius.smm.api.exception;
 
-import java.util.UUID;
-
 public class QueueFullException extends RuntimeException {
 
-  private final UUID taskId;
+  private final String taskId;
 
-  public QueueFullException(final UUID taskId) {
+  public QueueFullException(final String taskId) {
     super("Async queue is full for task " + taskId);
     this.taskId = taskId;
   }
 
-  public UUID getTaskId() {
+  public String getTaskId() {
     return taskId;
   }
 }

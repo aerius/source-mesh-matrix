@@ -16,18 +16,16 @@
  */
 package nl.aerius.smm.api.exception;
 
-import java.util.UUID;
-
 public class TaskNotFoundException extends RuntimeException {
 
-  private final UUID taskId;
+  private final String taskId;
 
-  public TaskNotFoundException(final UUID taskId) {
+  public TaskNotFoundException(final String taskId) {
     super("Task not found " + taskId);
     this.taskId = taskId;
   }
 
-  public UUID getTaskId() {
+  public String getTaskId() {
     return taskId;
   }
 }

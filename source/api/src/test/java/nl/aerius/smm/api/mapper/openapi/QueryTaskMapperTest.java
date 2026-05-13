@@ -19,8 +19,6 @@ package nl.aerius.smm.api.mapper.openapi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +35,7 @@ class QueryTaskMapperTest {
 
   @Test
   void testMapRoundTrip() {
-    final UUID queryId = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+    final String queryId = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
     final String statusUrl = "/api/v1/matrix/queries/" + queryId;
     final String resultUrl = statusUrl + "/result";
 
@@ -49,7 +47,7 @@ class QueryTaskMapperTest {
   }
 
   private void assertStatus(
-      final UUID queryId,
+      final String queryId,
       final QueryStatus domainStatus,
       final RestMatrixQueryStatusResponse.StatusEnum expectedRestStatus,
       final String expectedStatusUrl,
@@ -67,7 +65,7 @@ class QueryTaskMapperTest {
 
   @Test
   void testMapNulls() {
-    final UUID queryId = UUID.fromString("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22");
+    final String queryId = "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22";
     final RestMatrixQueryStatusResponse rest = mapper.toRestMatrixQueryStatusResponse(queryId, null);
     assertEquals(RestMatrixQueryStatusResponse.StatusEnum.PROCESSING, rest.getStatus(),
         "null QueryStatus -> REST should default status to PROCESSING");

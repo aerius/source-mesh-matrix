@@ -52,7 +52,10 @@ paths:
           description: Query accepted (for asynchronous processing)
           headers:
             Location:
-              $ref: '#/components/headers/LocationHeader'
+              description: The (relative) URL to poll for the current status of the asynchronous query
+              schema:
+                type: string
+                format: uri-reference
           content:
             application/json:
               schema:
@@ -208,13 +211,6 @@ components:
       schema:
         $ref: '#/components/schemas/QueryId'
 
-  headers:
-    LocationHeader:
-      description: The (relative) URL to poll for the current status of the asynchronous query
-      schema:
-        type: string
-        format: uri-reference
-
   responses:
     ErrorResponse:
       description: Error
@@ -227,8 +223,10 @@ components:
 
     QueryId:
       type: string
-      description: Unique identifier of the asynchronous query
-      format: uuid
+      description: >
+        Unique identifier of the asynchronous query. Only ASCII letters, digits, and dashes
+        (a-z, A-Z, 0-9, -); at most 256 characters. Safe to use unescaped in URL path segments and JSON.
+        Validated in the service layer before use.
       examples:
         - "550e8400-e29b-41d4-a716-446655440000"
 

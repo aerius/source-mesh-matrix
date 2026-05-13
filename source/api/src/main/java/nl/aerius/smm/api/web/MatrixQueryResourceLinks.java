@@ -16,8 +16,6 @@
  */
 package nl.aerius.smm.api.web;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,9 +47,9 @@ public class MatrixQueryResourceLinks {
   /**
    * Path to the query status resource, e.g. {@code /api/v1/matrix/queries/{id}}.
    */
-  public String relativeStatusPath(final UUID queryId) {
+  public String relativeStatusPath(final String queryId) {
     return UriComponentsBuilder.fromPath(normalizedApiBasePath)
-        .pathSegment("matrix", "queries", queryId.toString())
+        .pathSegment("matrix", "queries", queryId)
         .build()
         .toUriString();
   }
@@ -59,9 +57,9 @@ public class MatrixQueryResourceLinks {
   /**
    * Path to the query result resource, e.g. {@code /api/v1/matrix/queries/{id}/result}.
    */
-  public String relativeResultPath(final UUID queryId) {
+  public String relativeResultPath(final String queryId) {
     return UriComponentsBuilder.fromPath(normalizedApiBasePath)
-        .pathSegment("matrix", "queries", queryId.toString(), "result")
+        .pathSegment("matrix", "queries", queryId, "result")
         .build()
         .toUriString();
   }
