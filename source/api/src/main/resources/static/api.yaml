@@ -223,10 +223,7 @@ components:
 
     QueryId:
       type: string
-      description: >
-        Unique identifier of the asynchronous query. Only ASCII letters, digits, and dashes
-        (a-z, A-Z, 0-9, -); at most 256 characters. Safe to use unescaped in URL path segments and JSON.
-        Validated in the service layer before use.
+      description: Unique identifier of the asynchronous query.
       examples:
         - "550e8400-e29b-41d4-a716-446655440000"
 

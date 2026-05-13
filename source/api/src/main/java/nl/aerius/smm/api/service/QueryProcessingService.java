@@ -56,7 +56,7 @@ public class QueryProcessingService {
     final QueryTask task = QueryTask.create(request);
 
     // Add trace ID
-    MDC.put("taskId", task.id().toString());
+    MDC.put("taskId", task.id());
 
     tasks.put(task.id(), task);
     updateTaskInQueue(task.id(), QueryTask::accepted);

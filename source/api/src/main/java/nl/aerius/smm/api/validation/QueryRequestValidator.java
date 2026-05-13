@@ -24,7 +24,7 @@ import jakarta.validation.Validator;
 
 import org.springframework.stereotype.Component;
 
-import nl.aerius.smm.api.exception.InvalidRequestException;
+import nl.aerius.smm.api.exception.InvalidQueryRequestException;
 import nl.aerius.smm.api.model.QueryRequest;
 
 @Component
@@ -38,7 +38,7 @@ public class QueryRequestValidator {
 
   public void validateComplete(final QueryRequest request) {
     if (request == null) {
-      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, "request is required");
+      throw new InvalidQueryRequestException("request is required");
     }
     final Set<ConstraintViolation<QueryRequest>> violations = validator.validate(request);
     if (!violations.isEmpty()) {
@@ -46,7 +46,7 @@ public class QueryRequestValidator {
           .map(ConstraintViolation::getMessage)
           .sorted()
           .collect(Collectors.joining("; "));
-      throw new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, message);
+      throw new InvalidQueryRequestException(message);
     }
   }
 }

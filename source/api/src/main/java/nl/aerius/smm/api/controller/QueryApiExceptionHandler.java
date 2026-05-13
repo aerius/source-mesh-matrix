@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import nl.aerius.smm.api.exception.InvalidRequestException;
+import nl.aerius.smm.api.exception.InvalidQueryRequestException;
 import nl.aerius.smm.api.exception.QueueFullException;
 import nl.aerius.smm.api.exception.ResultNotReadyException;
 import nl.aerius.smm.api.exception.TaskNotFoundException;
@@ -72,14 +72,14 @@ public class QueryApiExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(InvalidRequestException.class)
-  public ResponseEntity<RestErrorMessage> handleInvalidRequest(final InvalidRequestException ex) {
-    LOG.debug("Invalid request: code={}", ex.getCode(), ex);
+  @ExceptionHandler(InvalidQueryRequestException.class)
+  public ResponseEntity<RestErrorMessage> handleInvalidQueryRequest(final InvalidQueryRequestException ex) {
+    LOG.debug("Invalid matrix query request.", ex);
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(new RestErrorMessage().toBuilder()
-            .code(ex.getCode())
+            .code(InvalidQueryRequestException.INVALID_QUERY_REQUEST)
             .message(ex.getMessage())
             .build());
   }

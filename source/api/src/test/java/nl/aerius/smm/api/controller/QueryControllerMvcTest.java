@@ -40,7 +40,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.aerius.smm.api.exception.InvalidRequestException;
+import nl.aerius.smm.api.exception.InvalidQueryRequestException;
 import nl.aerius.smm.api.exception.QueueFullException;
 import nl.aerius.smm.api.exception.ResultNotReadyException;
 import nl.aerius.smm.api.exception.TaskNotFoundException;
@@ -59,11 +59,10 @@ import nl.aerius.smm.api.model.QueryRequest;
 import nl.aerius.smm.api.model.QueryResultResponse;
 import nl.aerius.smm.api.model.QueryStatus;
 import nl.aerius.smm.api.service.QueryProcessingService;
-import nl.aerius.smm.api.validation.QueryIdValidator;
 import nl.aerius.smm.api.validation.QueryRequestValidator;
 
 @WebMvcTest(controllers = QueryApiController.class)
-@Import({ QueryController.class, QueryIdValidator.class })
+@Import({ QueryController.class })
 class QueryControllerMvcTest {
 
   private static final String BASE = "/api/v1";
@@ -87,19 +86,6 @@ class QueryControllerMvcTest {
 
   @MockitoBean
   private QueryRequestValidator queryRequestValidator;
-
-  @Test
-  void testGetStatusInvalidQueryIdPath() throws Exception {
-    final MvcResult res = mockMvc.perform(get(BASE + "/matrix/queries/{queryId}", "bad_id"))
-        .andReturn();
-
-    assertEquals(HttpStatus.BAD_REQUEST.value(), res.getResponse().getStatus(),
-        "GET /matrix/queries/{id} with invalid queryId -> should return 400 Bad Request");
-    final JsonNode json = objectMapper.readTree(res.getResponse().getContentAsString(StandardCharsets.UTF_8));
-    assertEquals("INVALID_QUERY_ID", json.get("code").asText());
-    assertEquals(true, json.get("message").asText().contains("queryId"),
-        "invalid queryId -> JSON message should describe queryId rules");
-  }
 
   @Test
   void testPostAccepted() throws Exception {
@@ -239,7 +225,7 @@ class QueryControllerMvcTest {
     final QueryRequest domainRequest = domainSampleRequest();
 
     when(queryRequestMapper.toQueryRequest(any(RestMatrixQueryRequest.class))).thenReturn(domainRequest);
-    doThrow(new InvalidRequestException(InvalidRequestException.INVALID_QUERY_REQUEST, "meshPoints invalid"))
+    doThrow(new InvalidQueryRequestException("meshPoints invalid"))
         .when(queryRequestValidator).validateComplete(domainRequest);
 
     final MvcResult res = mockMvc.perform(post(BASE + QueryApi.PATH_CREATE_MATRIX_QUERY)

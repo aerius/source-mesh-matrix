@@ -16,19 +16,12 @@
  */
 package nl.aerius.smm.api.exception;
 
-public final class InvalidRequestException extends RuntimeException {
+/** Raised when a matrix query request validation fails. Maps to HTTP 400 with {@link #INVALID_QUERY_REQUEST}. */
+public final class InvalidQueryRequestException extends RuntimeException {
 
-  public static final String INVALID_QUERY_ID = "INVALID_QUERY_ID";
   public static final String INVALID_QUERY_REQUEST = "INVALID_QUERY_REQUEST";
 
-  private final String code;
-
-  public InvalidRequestException(final String code, final String message) {
+  public InvalidQueryRequestException(final String message) {
     super(message);
-    this.code = code;
-  }
-
-  public String getCode() {
-    return code;
   }
 }
