@@ -52,7 +52,10 @@ paths:
           description: Query accepted (for asynchronous processing)
           headers:
             Location:
-              $ref: '#/components/headers/LocationHeader'
+              description: The (relative) URL to poll for the current status of the asynchronous query
+              schema:
+                type: string
+                format: uri-reference
           content:
             application/json:
               schema:
@@ -208,13 +211,6 @@ components:
       schema:
         $ref: '#/components/schemas/QueryId'
 
-  headers:
-    LocationHeader:
-      description: The (relative) URL to poll for the current status of the asynchronous query
-      schema:
-        type: string
-        format: uri-reference
-
   responses:
     ErrorResponse:
       description: Error
@@ -227,7 +223,7 @@ components:
 
     QueryId:
       type: string
-      description: Unique identifier of the asynchronous query
+      description: Unique identifier of the asynchronous query.
       examples:
         - "550e8400-e29b-41d4-a716-446655440000"
 
@@ -262,7 +258,7 @@ components:
           type: integer
       required:
         - x
-        - ySubstance
+        - y
       examples:
         - x: 100
           y: 200
@@ -283,7 +279,7 @@ components:
           $ref: '#/components/schemas/ResultType'
         value:
           type: number
-          format: float
+          format: double
           description: Calculated matrix value
       required:
         - source_point
@@ -326,6 +322,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Substance"
+        result_types:
+          description: Query by result type(s)
+          type: array
+          items:
+            $ref: "#/components/schemas/ResultType"
         source_characteristics:
           type: object
           description: Query by source characteristics
@@ -335,12 +336,15 @@ components:
             height:
               description: Query by source height
               type: number
+              format: double
             heat_content:
               description: Query by heat content
               type: number
+              format: double
             spread:
               description: Query by spread
               type: number
+              format: double
             emission_diurnal_variation:
               description: Query by emission diurnal variation ID
               type: integer
@@ -365,20 +369,17 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Point'
-        result_types:
-          description: Query by result type(s)
-          type: array
-          items:
-            $ref: "#/components/schemas/ResultType"
       required:
         - calculation_version
         - substances
+        - result_types
         - source_characteristics
         - mesh_points
         - source_points
       examples:
         - calculation_version: "2025.2"
           substances: ["NOx", "NH3"]
+          result_types: ["Deposition", "Concentration"]
           source_characteristics:
             height: 1.0
             heat_content: 10.5
@@ -394,7 +395,6 @@ components:
               y: 200
             - x: 150
               y: 250
-          result_types: ["Deposition", "Concentration"]
 
     MatrixQueryStatusResponse:
       type: object
@@ -459,6 +459,7 @@ components:
         - query:
             calculation_version: "2025.2"
             substances: ["NOx"]
+            result_types: ["Deposition", "Concentration"]
             source_characteristics:
               height: 1.0
               heat_content: 10.5
@@ -470,7 +471,6 @@ components:
             source_points:
               - x: 100
                 y: 200
-            result_types: ["Deposition", "Concentration"]
           records:
             - source_point:
                 x: 100
