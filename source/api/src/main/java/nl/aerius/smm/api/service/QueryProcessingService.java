@@ -43,6 +43,7 @@ import nl.aerius.smm.api.model.QueryTask;
 public class QueryProcessingService {
   private static final Logger LOG = LoggerFactory.getLogger(QueryProcessingService.class);
 
+  // TODO: We still need to remove the tasks on failyre and rejection
   private final Map<String, QueryTask> tasks = new ConcurrentHashMap<>();
   private final Executor requestExecutor;
   private final MatrixService matrixService;
