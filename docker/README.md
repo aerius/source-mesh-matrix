@@ -4,7 +4,7 @@
 
 ### Prerequisites
 - [CI/CD repository](https://github.com/aerius/cicd-scripts.git) is checked out locally
-- Enviroment variable `CICD_SCRIPTS_DIR` is set
+- Environment variable `CICD_SCRIPTS_DIR` is set
 - Docker and Docker Compose installed and running
 
 ### Build all images
@@ -20,9 +20,9 @@ mvn clean package -Pdeploy -DskipTest
 cd ../docker
 
 # Set the CI/CD scripts directory (if not set)
-export CICD_SCRIPTS_DIR=/examle/folder/cicd-scripts
+export CICD_SCRIPTS_DIR=/example/folder/cicd-scripts
 
-# Execute the build script
+# Execute the prepare and build script
 ${CICD_SCRIPTS_DIR}/docker/images_v1.0.sh
 ```
 
@@ -34,4 +34,7 @@ docker run -d -p <host-port>:<container-port> --restart unless-stopped <image-na
 
 # For example, to run the api on port 8085:
 docker run -d -p 8085:8080 --restart unless-stopped api:latest
+
+# Or ClickHouse on the default HTTP port for both JDBC and the Play UI:
+docker run -d -p 8123:8123 --restart unless-stopped database:latest
 ```

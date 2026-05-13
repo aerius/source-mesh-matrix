@@ -14,6 +14,13 @@ cd "${SCRIPT_DIR}"
 # include functions
 source "${CICD_SCRIPTS_DIR}"/docker/images/v1.0/functions.sh
 
+# database
+if _cicd_is_module_enabled "${1}" 'database'; then
+  mkdir -p "${DOCKER_COMMON_DIR}"/database/source
+  cp -auv "${SOURCE_DIR}"/database/src/main/sql/*.sql \
+    "${DOCKER_COMMON_DIR}"/database/source/
+fi
+
 # api
 if _cicd_is_module_enabled "${1}" 'api'; then
   cp -auv "${SOURCE_DIR}"/api/target/smm-api-*.jar \

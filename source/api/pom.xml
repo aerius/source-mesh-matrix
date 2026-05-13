@@ -31,7 +31,13 @@
 
   <properties>
     <smm.api.generated.base>nl.aerius.smm.api.generated</smm.api.generated.base>
+    <jooq.version>3.21.1</jooq.version>
+    <clickhouse-jdbc.version>0.8.6</clickhouse-jdbc.version>
     <mapstruct.version>1.6.3</mapstruct.version>
+    <generate-jooq.url>jdbc:ch:http://localhost:8123/smm</generate-jooq.url>
+    <generate-jooq.schema>smm</generate-jooq.schema>
+    <generate-jooq.username>aerius</generate-jooq.username>
+    <generate-jooq.password>aerius</generate-jooq.password>
   </properties>
 
   <dependencies>
@@ -48,6 +54,18 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+
+    <!-- Database dependencies -->
+    <dependency>
+      <groupId>com.clickhouse</groupId>
+      <artifactId>clickhouse-jdbc</artifactId>
+      <version>${clickhouse-jdbc.version}</version>
+    </dependency>
+
     <!-- Dependencies for generated code -->
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
@@ -58,6 +76,11 @@
       <artifactId>jackson-databind-nullable</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>${jooq.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
@@ -100,6 +123,14 @@
               <version>${mapstruct.version}</version>
             </path>
           </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/*IT.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
 
@@ -171,4 +202,67 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>with-integration-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*IT.java</include>
+              </includes>
+              <excludes combine.self="override" />
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>generate-jooq</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen-maven</artifactId>
+            <version>${jooq.version}</version>
+            <executions>
+              <execution>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <jdbc>
+                <driver>com.clickhouse.jdbc.ClickHouseDriver</driver>
+                <url>${generate-jooq.url}</url>
+                <user>${generate-jooq.username}</user>
+                <password>${generate-jooq.password}</password>
+              </jdbc>
+              <generator>
+                <database>
+                  <name>org.jooq.meta.clickhouse.ClickHouseDatabase</name>
+                  <includes>.*</includes>
+                  <schemata>
+                    <schema>
+                      <inputSchema>${generate-jooq.schema}</inputSchema>
+                      <outputSchemaToDefault>true</outputSchemaToDefault>
+                    </schema>
+                  </schemata>
+                </database>
+                <target>
+                  <packageName>${smm.api.generated.base}.jooq</packageName>
+                  <directory>${project.basedir}/src/main/java</directory>
+                </target>
+              </generator>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

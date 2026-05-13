@@ -22,9 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import nl.aerius.smm.api.config.EndpointsConfig.EndpointsProperties;
 
 /**
- * Builds root-relative matrix query paths from {@link EndpointsProperties#basePath()} ({@code app.endpoints.base-path}).
- * When unset or {@code /}, defaults to {@code /api/v1} so self-links match the OpenAPI server URL.
- * Used by {@link nl.aerius.smm.api.mapper.openapi.QueryTaskMapper}.
+ * Builds root-relative matrix query paths.
  */
 @Component
 public class MatrixQueryResourceLinks {
@@ -35,13 +33,6 @@ public class MatrixQueryResourceLinks {
 
   public MatrixQueryResourceLinks(final EndpointsProperties endpoints) {
     this.normalizedApiBasePath = linkBasePath(endpoints.basePath());
-  }
-
-  /**
-   * Normalized root-relative API prefix (no trailing slash), e.g. {@code /api/v1}.
-   */
-  public String apiBasePath() {
-    return normalizedApiBasePath;
   }
 
   /**
@@ -62,13 +53,6 @@ public class MatrixQueryResourceLinks {
         .pathSegment("matrix", "queries", queryId, "result")
         .build()
         .toUriString();
-  }
-
-  /**
-   * Same rules as the instance constructor: trim, leading slash, no trailing slash, fallback {@code /api/v1}.
-   */
-  public static String normalizeApiBasePath(final String basePath) {
-    return linkBasePath(basePath);
   }
 
   /**

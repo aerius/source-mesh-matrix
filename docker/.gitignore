@@ -11,5 +11,6 @@ compose
 common/api/Dockerfile
 
 # Ignore source folders
+common/database/source
 
 # Ignore generated script files

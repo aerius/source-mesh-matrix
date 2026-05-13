@@ -32,7 +32,11 @@ import nl.aerius.smm.api.web.MatrixQueryResourceLinks;
  */
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "nl.aerius.smm.api.mapper")
+@ComponentScan(basePackages = {
+    "nl.aerius.smm.api.catalog.mapper",
+    "nl.aerius.smm.api.query.mapper",
+    "nl.aerius.smm.api.matrix.mapper"
+})
 @Import({ MatrixQueryResourceLinks.class, EndpointsConfig.class })
 public class TestApplication {
 }

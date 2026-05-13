@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(EndpointsConfig.EndpointsProperties.class)
 public class EndpointsConfig {
 
-  /** Binds {@code aerius.endpoints.*} (public API path prefix for links and, via bridge, generated controllers). */
   @ConfigurationProperties(prefix = "aerius.endpoints")
   public record EndpointsProperties(@DefaultValue("") String basePath) {
   }

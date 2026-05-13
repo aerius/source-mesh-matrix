@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.query.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,9 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryRequest;
-import nl.aerius.smm.api.model.Point;
-import nl.aerius.smm.api.model.QueryRequest;
-import nl.aerius.smm.api.model.SourceCharacteristics;
+import nl.aerius.smm.api.common.Point;
+import nl.aerius.smm.api.query.model.QueryRequest;
+import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
 @SpringBootTest(classes = TestApplication.class)
 class QueryRequestMapperTest {

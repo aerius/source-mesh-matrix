@@ -51,18 +51,20 @@ import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryStatusResponse;
 import nl.aerius.smm.api.generated.openapi.model.RestPoint;
 import nl.aerius.smm.api.generated.openapi.model.RestSourceCharacteristics;
-import nl.aerius.smm.api.mapper.openapi.QueryRequestMapper;
-import nl.aerius.smm.api.mapper.openapi.QueryResultMapper;
-import nl.aerius.smm.api.mapper.openapi.QueryTaskMapper;
-import nl.aerius.smm.api.model.Point;
-import nl.aerius.smm.api.model.QueryRequest;
-import nl.aerius.smm.api.model.QueryResultResponse;
-import nl.aerius.smm.api.model.QueryStatus;
-import nl.aerius.smm.api.service.QueryProcessingService;
-import nl.aerius.smm.api.validation.QueryRequestValidator;
+import nl.aerius.smm.api.query.mapper.openapi.QueryRequestMapper;
+import nl.aerius.smm.api.query.mapper.openapi.QueryResultMapper;
+import nl.aerius.smm.api.query.mapper.openapi.QueryTaskMapper;
+import nl.aerius.smm.api.common.Point;
+import nl.aerius.smm.api.query.model.QueryRequest;
+import nl.aerius.smm.api.query.model.QueryResultResponse;
+import nl.aerius.smm.api.query.model.QueryStatus;
+import nl.aerius.smm.api.query.controller.QueryController;
+import nl.aerius.smm.api.query.controller.QueryApiExceptionHandler;
+import nl.aerius.smm.api.query.service.QueryProcessingService;
+import nl.aerius.smm.api.query.validation.QueryRequestValidator;
 
 @WebMvcTest(controllers = QueryApiController.class)
-@Import({ QueryController.class })
+@Import({ QueryController.class, QueryApiExceptionHandler.class })
 class QueryControllerMvcTest {
 
   private static final String BASE = "/api/v1";
@@ -247,7 +249,7 @@ class QueryControllerMvcTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new nl.aerius.smm.api.model.SourceCharacteristics(null, 1d, 10d, 2d, 1),
+        new nl.aerius.smm.api.catalog.model.SourceCharacteristics(null, 1d, 10d, 2d, 1),
         List.of(new Point(1, 2)),
         List.of(new Point(3, 4)));
   }

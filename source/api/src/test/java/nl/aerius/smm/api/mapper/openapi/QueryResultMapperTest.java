@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.query.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,11 +27,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
-import nl.aerius.smm.api.model.MatrixResultRecord;
-import nl.aerius.smm.api.model.Point;
-import nl.aerius.smm.api.model.QueryRequest;
-import nl.aerius.smm.api.model.QueryResultResponse;
-import nl.aerius.smm.api.model.SourceCharacteristics;
+import nl.aerius.smm.api.matrix.model.MatrixCell;
+import nl.aerius.smm.api.common.Point;
+import nl.aerius.smm.api.query.model.QueryRequest;
+import nl.aerius.smm.api.query.model.QueryResultResponse;
+import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
 @SpringBootTest(classes = TestApplication.class)
 class QueryResultMapperTest {
@@ -48,18 +48,12 @@ class QueryResultMapperTest {
         new SourceCharacteristics(null, 5.0d, 1.1d, 0.2d, 1),
         List.of(new Point(0, 0)),
         List.of(new Point(1, 1)));
-    final MatrixResultRecord r1 = new MatrixResultRecord(
+    final MatrixCell r1 = new MatrixCell(
         new Point(1, 1),
         new Point(2, 3),
         "NOx",
         "concentration",
         1.25);
-    final MatrixResultRecord r2 = new MatrixResultRecord(
-        new Point(4, 5),
-        new Point(6, 7),
-        "NH3",
-        "deposition",
-        1.0d);
     final QueryResultResponse response = new QueryResultResponse(request, List.of(r1));
 
     final RestMatrixQueryResultResponse rest = queryResultMapper.toRestMatrixQueryResultResponse(response);
@@ -97,6 +91,6 @@ class QueryResultMapperTest {
     assertNull(queryResultMapper.toRestMatrixQueryResultResponse(null),
         "null QueryResultResponse -> REST should be null");
     assertNull(queryResultMapper.toRestMatrixResultRecord(null),
-        "null MatrixResultRecord -> REST should be null");
+        "null MatrixCell -> REST should be null");
   }
 }

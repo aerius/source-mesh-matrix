@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.catalog.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import nl.aerius.smm.api.TestApplication;
-import nl.aerius.smm.api.model.CalculationVersion;
-import nl.aerius.smm.api.model.ResultType;
-import nl.aerius.smm.api.model.Substance;
+import nl.aerius.smm.api.catalog.model.CalculationVersion;
+import nl.aerius.smm.api.catalog.model.ResultType;
+import nl.aerius.smm.api.catalog.model.Substance;
 
 @SpringBootTest(classes = TestApplication.class)
 class CatalogResponseMapperTest {

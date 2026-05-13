@@ -15,6 +15,12 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 services:
+  database:
+    build:
+      context: ../common/database
+      args:
+        - DATABASE_NAME=${AERIUS_DATABASE_NAME}
+    image: ${AERIUS_REGISTRY_URL}database:${AERIUS_IMAGE_TAG}
   api:
     build: ../common/api
     image: ${AERIUS_REGISTRY_URL}api:${AERIUS_IMAGE_TAG}
