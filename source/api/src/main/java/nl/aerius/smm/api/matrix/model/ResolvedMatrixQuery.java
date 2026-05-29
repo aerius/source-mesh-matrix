@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.matrix.service;
+package nl.aerius.smm.api.matrix.model;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import nl.aerius.smm.api.common.Point;
 import nl.aerius.smm.api.matrix.model.db.MatrixFixedDimensions;
@@ -29,4 +30,25 @@ public record ResolvedMatrixQuery(
     Map<Point, Integer> meshPointIdsByPoint,
     Map<Short, String> substanceNamesById,
     Map<Short, String> resultTypeNamesById,
-    Map<Integer, Point> meshPointsById) {}
+    Map<Integer, Point> meshPointsById) {
+
+  public ResolvedMatrixQuery(
+      final MatrixFixedDimensions fixedDimensions,
+      final Map<String, Short> substanceIdsByName,
+      final Map<String, Short> resultTypeIdsByName,
+      final Map<Point, Integer> meshPointIdsByPoint) {
+    this(
+        fixedDimensions,
+        substanceIdsByName,
+        resultTypeIdsByName,
+        meshPointIdsByPoint,
+        invertMap(substanceIdsByName),
+        invertMap(resultTypeIdsByName),
+        invertMap(meshPointIdsByPoint));
+  }
+
+  private static <K, V> Map<V, K> invertMap(final Map<K, V> map) {
+    return map.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+  }
+}

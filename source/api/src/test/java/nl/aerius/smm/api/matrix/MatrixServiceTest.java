@@ -46,7 +46,7 @@ import nl.aerius.smm.api.matrix.repository.MatrixRepository;
 import nl.aerius.smm.api.matrix.service.CalculationService;
 import nl.aerius.smm.api.matrix.service.MatrixQueryResolver;
 import nl.aerius.smm.api.matrix.service.MatrixService;
-import nl.aerius.smm.api.matrix.service.ResolvedMatrixQuery;
+import nl.aerius.smm.api.matrix.model.ResolvedMatrixQuery;
 import nl.aerius.smm.api.query.model.QueryRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,10 +57,7 @@ class MatrixServiceTest {
       SAMPLE_FIXED_DIMENSIONS,
       Map.of("NOx", (short) 1),
       Map.of("concentration", (short) 1),
-      Map.of(new Point(1, 2), 100),
-      Map.of((short) 1, "NOx"),
-      Map.of((short) 1, "concentration"),
-      Map.of(100, new Point(1, 2)));
+      Map.of(new Point(1, 2), 100));
 
   @Mock
   private CalculationService calculationService;

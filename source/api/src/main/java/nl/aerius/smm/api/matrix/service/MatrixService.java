@@ -29,6 +29,7 @@ import nl.aerius.smm.api.matrix.mapper.MatrixCellExpander;
 import nl.aerius.smm.api.matrix.mapper.MatrixCellMapper;
 import nl.aerius.smm.api.matrix.model.MatrixCell;
 import nl.aerius.smm.api.matrix.model.MatrixCellKey;
+import nl.aerius.smm.api.matrix.model.ResolvedMatrixQuery;
 import nl.aerius.smm.api.matrix.model.db.MatrixDbRow;
 import nl.aerius.smm.api.matrix.model.db.MatrixVariableDimensions;
 import nl.aerius.smm.api.matrix.repository.MatrixRepository;

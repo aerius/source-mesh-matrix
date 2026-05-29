@@ -19,7 +19,7 @@ package nl.aerius.smm.api.matrix.mapper;
 import org.springframework.stereotype.Component;
 
 import nl.aerius.smm.api.common.Point;
-import nl.aerius.smm.api.matrix.service.ResolvedMatrixQuery;
+import nl.aerius.smm.api.matrix.model.ResolvedMatrixQuery;
 import nl.aerius.smm.api.matrix.model.MatrixCell;
 import nl.aerius.smm.api.matrix.model.MatrixCellKey;
 import nl.aerius.smm.api.matrix.model.db.MatrixDbRow;

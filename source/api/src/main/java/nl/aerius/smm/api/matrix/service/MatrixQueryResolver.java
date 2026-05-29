@@ -33,6 +33,7 @@ import nl.aerius.smm.api.catalog.repository.SourceCharacteristicsRepository;
 import nl.aerius.smm.api.catalog.repository.SubstanceRepository;
 import nl.aerius.smm.api.common.Point;
 import nl.aerius.smm.api.exception.InvalidQueryRequestException;
+import nl.aerius.smm.api.matrix.model.ResolvedMatrixQuery;
 import nl.aerius.smm.api.matrix.model.db.MatrixFixedDimensions;
 import nl.aerius.smm.api.query.model.QueryRequest;
 
@@ -98,22 +99,10 @@ public class MatrixQueryResolver {
     final short sourceCharacteristicId = sourceCharacteristicsRepository.findId(request.sourceCharacteristics())
         .orElseThrow(() -> new InvalidQueryRequestException("Unknown source characteristics"));
 
-    final Map<String, Short> substanceIds = Map.copyOf(substanceIdsByName);
-    final Map<String, Short> resultTypeIds = Map.copyOf(resultTypeIdsByName);
-    final Map<Point, Integer> meshPointIds = Map.copyOf(meshPointIdsByPoint);
-
     return new ResolvedMatrixQuery(
         new MatrixFixedDimensions(calculationVersion.calculationVersionId(), sourceCharacteristicId),
-        substanceIds,
-        resultTypeIds,
-        meshPointIds,
-        invertMap(substanceIds),
-        invertMap(resultTypeIds),
-        invertMap(meshPointIds));
-  }
-
-  private static <K, V> Map<V, K> invertMap(final Map<K, V> map) {
-    return map.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        substanceIdsByName,
+        resultTypeIdsByName,
+        meshPointIdsByPoint);
   }
 }

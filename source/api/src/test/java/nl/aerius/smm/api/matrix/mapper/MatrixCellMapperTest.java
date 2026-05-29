@@ -29,7 +29,7 @@ import nl.aerius.smm.api.matrix.model.MatrixCellKey;
 import nl.aerius.smm.api.matrix.model.db.MatrixDbRow;
 import nl.aerius.smm.api.matrix.model.db.MatrixFixedDimensions;
 import nl.aerius.smm.api.matrix.model.db.MatrixVariableDimensions;
-import nl.aerius.smm.api.matrix.service.ResolvedMatrixQuery;
+import nl.aerius.smm.api.matrix.model.ResolvedMatrixQuery;
 
 class MatrixCellMapperTest {
 
@@ -38,10 +38,7 @@ class MatrixCellMapperTest {
       FIXED_DIMENSIONS,
       Map.of("NOx", (short) 1),
       Map.of("concentration", (short) 2),
-      Map.of(new Point(1, 2), 100),
-      Map.of((short) 1, "NOx"),
-      Map.of((short) 2, "concentration"),
-      Map.of(100, new Point(1, 2)));
+      Map.of(new Point(1, 2), 100));
 
   private final MatrixCellMapper mapper = new MatrixCellMapper();
 
