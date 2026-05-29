@@ -22,20 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryRequest;
 import nl.aerius.smm.api.common.Point;
 import nl.aerius.smm.api.query.model.QueryRequest;
 import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
-@SpringBootTest(classes = TestApplication.class)
 class QueryRequestMapperTest {
 
-  @Autowired
-  private QueryRequestMapper mapper;
+  private final QueryRequestMapper mapper = Mappers.getMapper(QueryRequestMapper.class);
 
   @Test
   void testMapRoundTrip() {

@@ -20,18 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.jooq.tables.records.ResultTypesRecord;
 import nl.aerius.smm.api.catalog.model.ResultType;
 
-@SpringBootTest(classes = TestApplication.class)
 class ResultTypeRecordMapperTest {
 
-  @Autowired
-  private ResultTypeRecordMapper mapper;
+  private final ResultTypeRecordMapper mapper = Mappers.getMapper(ResultTypeRecordMapper.class);
 
   @Test
   void testMapDomainRoundTrip() {

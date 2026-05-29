@@ -48,7 +48,7 @@ Run tests
 mvn test
 ```
 
-Integration tests need a local ClickHouse ([build images](../../docker/README.md); `localhost:8123`, database `smm`, user `aerius`). The Docker image starts only the server; Flyway in this project creates the schema when ITs run.
+Integration tests need a local ClickHouse ([build images](../../docker/README.md); `localhost:8123`, database `smm`, user `aerius`). The Docker image starts only the server. IT classes use `@ActiveProfiles("test")` and load `src/test/resources/application-test.properties` so Flyway creates the schema on first Spring context startup. JDBC settings come from main `application.properties`.
 
 ```bash
 docker run -d -p 8123:8123 --restart unless-stopped database:latest

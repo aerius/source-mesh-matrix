@@ -33,16 +33,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-
-import nl.aerius.smm.api.SMMApiApplication;
+import org.springframework.test.context.ActiveProfiles;
 import nl.aerius.smm.api.common.Point;
 import nl.aerius.smm.api.matrix.model.db.MatrixDbRow;
 import nl.aerius.smm.api.matrix.model.db.MatrixFixedDimensions;
 import nl.aerius.smm.api.matrix.model.db.MatrixVariableDimensions;
 
-@SpringBootTest(classes = SMMApiApplication.class)
-@TestPropertySource(properties = "spring.flyway.enabled=true")
+@SpringBootTest
+@ActiveProfiles("test")
 class MatrixRepositoryIT {
 
   private static final short CALCULATION_VERSION_ID = 9001;

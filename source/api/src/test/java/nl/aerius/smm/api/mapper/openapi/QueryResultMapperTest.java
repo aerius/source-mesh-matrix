@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
 import nl.aerius.smm.api.matrix.model.MatrixCell;
 import nl.aerius.smm.api.common.Point;
@@ -33,11 +33,16 @@ import nl.aerius.smm.api.query.model.QueryRequest;
 import nl.aerius.smm.api.query.model.QueryResultResponse;
 import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
-@SpringBootTest(classes = TestApplication.class)
 class QueryResultMapperTest {
 
-  @Autowired
   private QueryResultMapper queryResultMapper;
+
+  @BeforeEach
+  void setUp() {
+    final QueryResultMapperImpl impl = new QueryResultMapperImpl();
+    ReflectionTestUtils.setField(impl, "queryRequestMapper", Mappers.getMapper(QueryRequestMapper.class));
+    queryResultMapper = impl;
+  }
 
   @Test
   void testMapQueryResultResponseToRest() {

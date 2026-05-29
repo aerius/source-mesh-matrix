@@ -20,21 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.common.Point;
 import nl.aerius.smm.api.generated.jooq.tables.records.MatrixRecord;
 import nl.aerius.smm.api.matrix.model.db.MatrixDbRow;
 import nl.aerius.smm.api.matrix.model.db.MatrixFixedDimensions;
 import nl.aerius.smm.api.matrix.model.db.MatrixVariableDimensions;
 
-@SpringBootTest(classes = TestApplication.class)
 class MatrixRecordMapperTest {
 
-  @Autowired
-  private MatrixRecordMapper mapper;
+  private final MatrixRecordMapper mapper = new MatrixRecordMapper();
 
   @Test
   void testMapDomainRoundTrip() {
