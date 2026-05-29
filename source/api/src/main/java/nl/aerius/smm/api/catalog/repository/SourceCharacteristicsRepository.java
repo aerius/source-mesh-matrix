@@ -40,9 +40,9 @@ public class SourceCharacteristicsRepository {
     }
     return dsl.select(SOURCE_CHARACTERISTICS.SOURCE_CHARACTERISTIC_ID)
         .from(SOURCE_CHARACTERISTICS)
-        .where(SOURCE_CHARACTERISTICS.HEIGHT.eq((float) sourceCharacteristics.height()))
-        .and(SOURCE_CHARACTERISTICS.HEAT_CONTENT.eq((float) sourceCharacteristics.heatContent()))
-        .and(SOURCE_CHARACTERISTICS.SPREAD.eq((float) sourceCharacteristics.spread()))
+        .where(SOURCE_CHARACTERISTICS.HEIGHT.eq(sourceCharacteristics.height()))
+        .and(SOURCE_CHARACTERISTICS.HEAT_CONTENT.eq(sourceCharacteristics.heatContent()))
+        .and(SOURCE_CHARACTERISTICS.SPREAD.eq(sourceCharacteristics.spread()))
         .and(SOURCE_CHARACTERISTICS.EMISSION_DIURNAL_VARIATION.eq((short) sourceCharacteristics.emissionDiurnalVariation()))
         .fetchOptional(SOURCE_CHARACTERISTICS.SOURCE_CHARACTERISTIC_ID);
   }

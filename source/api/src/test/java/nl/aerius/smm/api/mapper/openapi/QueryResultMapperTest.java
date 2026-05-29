@@ -45,7 +45,7 @@ class QueryResultMapperTest {
         "2030",
         List.of("SO2"),
         List.of("concentration"),
-        new SourceCharacteristics(null, 5.0d, 1.1d, 0.2d, 1),
+        new SourceCharacteristics(null, 5, 1, 1, 1),
         List.of(new Point(0, 0)),
         List.of(new Point(1, 1)));
     final MatrixCell r1 = new MatrixCell(
@@ -64,11 +64,11 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve substances");
     assertEquals(List.of("concentration"), rest.getQuery().getResultTypes(),
         "domain -> REST nested query should preserve resultTypes");
-    assertEquals(5.0d, rest.getQuery().getSourceCharacteristics().getHeight(),
+    assertEquals(5, rest.getQuery().getSourceCharacteristics().getHeight(),
         "domain -> REST nested query should preserve sourceCharacteristics height");
-    assertEquals(1.1d, rest.getQuery().getSourceCharacteristics().getHeatContent(),
+    assertEquals(1, rest.getQuery().getSourceCharacteristics().getHeatContent(),
         "domain -> REST nested query should preserve sourceCharacteristics heatContent");
-    assertEquals(0.2d, rest.getQuery().getSourceCharacteristics().getSpread(),
+    assertEquals(1, rest.getQuery().getSourceCharacteristics().getSpread(),
         "domain -> REST nested query should preserve sourceCharacteristics spread");
     assertEquals(1, rest.getQuery().getSourceCharacteristics().getEmissionDiurnalVariation(),
         "domain -> REST nested query should preserve sourceCharacteristics emissionDiurnalVariation");

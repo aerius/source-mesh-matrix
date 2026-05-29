@@ -143,7 +143,7 @@ class MatrixCalculationIT {
         "v1",
         List.of("NOx", "NH3"),
         List.of("concentration", "deposition"),
-        new SourceCharacteristics((short) 1, 1d, 10d, 2d, 1),
+        new SourceCharacteristics((short) 1, 1, 10, 2, 1),
         List.of(new Point(3, 4)),
         List.of(new Point(1, 2), new Point(5, 6)));
   }

@@ -151,7 +151,7 @@ class QueryProcessingServiceTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new SourceCharacteristics(null, 1d, 10d, 2d, 1),
+        new SourceCharacteristics(null, 1, 10, 2, 1),
         List.of(new Point(1, 2)),
         List.of(new Point(3, 4)));
   }

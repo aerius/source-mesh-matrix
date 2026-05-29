@@ -249,7 +249,7 @@ class QueryControllerMvcTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new nl.aerius.smm.api.catalog.model.SourceCharacteristics(null, 1d, 10d, 2d, 1),
+        new nl.aerius.smm.api.catalog.model.SourceCharacteristics(null, 1, 10, 2, 1),
         List.of(new Point(1, 2)),
         List.of(new Point(3, 4)));
   }
@@ -259,7 +259,7 @@ class QueryControllerMvcTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new RestSourceCharacteristics(1d, 10d, 2d, 1),
+        new RestSourceCharacteristics(1, 10, 2, 1),
         List.of(new RestPoint(1, 2)),
         List.of(new RestPoint(3, 4)));
   }

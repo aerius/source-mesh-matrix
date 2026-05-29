@@ -21,7 +21,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record SourceCharacteristics(
     @Nullable Short sourceCharacteristicId,
-    @NotNull(message = "height is required") double height,
-    @NotNull(message = "heatContent is required") double heatContent,
-    @NotNull(message = "spread is required") double spread,
+    @NotNull(message = "height is required") int height,
+    @NotNull(message = "heatContent is required") int heatContent,
+    @NotNull(message = "spread is required") int spread,
     @NotNull(message = "emission diurnal variation is required") int emissionDiurnalVariation) {}

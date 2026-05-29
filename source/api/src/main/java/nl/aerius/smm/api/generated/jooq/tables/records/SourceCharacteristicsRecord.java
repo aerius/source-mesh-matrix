@@ -35,54 +35,56 @@ public class SourceCharacteristicsRecord extends UpdatableRecordImpl<SourceChara
     /**
      * Setter for <code>source_characteristics.heat_content</code>.
      */
-    public void setHeatContent(Float value) {
+    public void setHeatContent(Integer value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>source_characteristics.heat_content</code>.
      */
-    public Float getHeatContent() {
-        return (Float) get(1);
+    public Integer getHeatContent() {
+        return (Integer) get(1);
     }
 
     /**
      * Setter for <code>source_characteristics.height</code>.
      */
-    public void setHeight(Float value) {
+    public void setHeight(Integer value) {
         set(2, value);
     }
 
     /**
      * Getter for <code>source_characteristics.height</code>.
      */
-    public Float getHeight() {
-        return (Float) get(2);
+    public Integer getHeight() {
+        return (Integer) get(2);
     }
 
     /**
      * Setter for <code>source_characteristics.spread</code>.
      */
-    public void setSpread(Float value) {
+    public void setSpread(Integer value) {
         set(3, value);
     }
 
     /**
      * Getter for <code>source_characteristics.spread</code>.
      */
-    public Float getSpread() {
-        return (Float) get(3);
+    public Integer getSpread() {
+        return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>source_characteristics.emission_diurnal_variation</code>.
+     * Setter for
+     * <code>source_characteristics.emission_diurnal_variation</code>.
      */
     public void setEmissionDiurnalVariation(Short value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>source_characteristics.emission_diurnal_variation</code>.
+     * Getter for
+     * <code>source_characteristics.emission_diurnal_variation</code>.
      */
     public Short getEmissionDiurnalVariation() {
         return (Short) get(4);
@@ -111,7 +113,7 @@ public class SourceCharacteristicsRecord extends UpdatableRecordImpl<SourceChara
     /**
      * Create a detached, initialised SourceCharacteristicsRecord
      */
-    public SourceCharacteristicsRecord(Short sourceCharacteristicId, Float heatContent, Float height, Float spread, Short emissionDiurnalVariation) {
+    public SourceCharacteristicsRecord(Short sourceCharacteristicId, Integer heatContent, Integer height, Integer spread, Short emissionDiurnalVariation) {
         super(SourceCharacteristics.SOURCE_CHARACTERISTICS);
 
         setSourceCharacteristicId(sourceCharacteristicId);

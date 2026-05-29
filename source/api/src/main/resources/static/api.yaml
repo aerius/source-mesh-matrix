@@ -334,17 +334,14 @@ components:
           additionalProperties: false
           properties:
             height:
-              description: Query by source height
-              type: number
-              format: double
+              description: Source height in cm
+              type: integer
             heat_content:
-              description: Query by heat content
-              type: number
-              format: double
+              description: Heat content in Watt
+              type: integer
             spread:
-              description: Query by spread
-              type: number
-              format: double
+              description: Spread in cm
+              type: integer
             emission_diurnal_variation:
               description: Query by emission diurnal variation ID
               type: integer
@@ -354,9 +351,9 @@ components:
             - spread
             - emission_diurnal_variation
           examples:
-            - height: 1.0
-              heat_content: 10.5
-              spread: 1.0
+            - height: 10
+              heat_content: 1050
+              spread: 10
               emission_diurnal_variation: 2
         mesh_points:
           description: Query by Mesh-point coordinate(s)
@@ -381,9 +378,9 @@ components:
           substances: ["NOx", "NH3"]
           result_types: ["Deposition", "Concentration"]
           source_characteristics:
-            height: 1.0
-            heat_content: 10.5
-            spread: 1.0
+            height: 10
+            heat_content: 1050
+            spread: 10
             emission_diurnal_variation: 2
           mesh_points:
             - x: 100001
@@ -461,9 +458,9 @@ components:
             substances: ["NOx"]
             result_types: ["Deposition", "Concentration"]
             source_characteristics:
-              height: 1.0
-              heat_content: 10.5
-              spread: 1.0
+              height: 10
+              heat_content: 1050
+              spread: 10
               emission_diurnal_variation: 2
             mesh_points:
               - x: 100001

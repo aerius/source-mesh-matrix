@@ -87,9 +87,9 @@ class QueryRequestMapperTest {
   private static QueryRequest sampleQueryRequest() {
     final SourceCharacteristics sourceCharacteristics = new SourceCharacteristics(
         (short) 99,
-        15.5d,
-        2.25d,
-        0.75d,
+        16,
+        2,
+        1,
         3);
     return new QueryRequest(
         "2024",

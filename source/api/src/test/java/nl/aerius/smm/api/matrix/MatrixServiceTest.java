@@ -151,7 +151,7 @@ class MatrixServiceTest {
         "v1",
         List.of("NOx"),
         List.of("concentration"),
-        new SourceCharacteristics((short) 1, 1d, 10d, 2d, 1),
+        new SourceCharacteristics((short) 1, 1, 10, 2, 1),
         List.of(new Point(1, 2)),
         sourcePoints);
   }

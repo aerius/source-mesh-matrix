@@ -27,9 +27,9 @@ ORDER BY substance_id;
  */
 CREATE TABLE source_characteristics (
 	source_characteristic_id Int16,
-	heat_content Float32,
-	height Float32,
-	spread Float32,
+	heat_content Int32,
+	height Int32,
+	spread Int32,
 	emission_diurnal_variation Int16
 ) ENGINE = MergeTree()
 ORDER BY source_characteristic_id;

@@ -58,17 +58,17 @@ public class SourceCharacteristics extends TableImpl<SourceCharacteristicsRecord
     /**
      * The column <code>source_characteristics.heat_content</code>.
      */
-    public final TableField<SourceCharacteristicsRecord, Float> HEAT_CONTENT = createField(DSL.name("heat_content"), SQLDataType.REAL.nullable(false), this, "");
+    public final TableField<SourceCharacteristicsRecord, Integer> HEAT_CONTENT = createField(DSL.name("heat_content"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>source_characteristics.height</code>.
      */
-    public final TableField<SourceCharacteristicsRecord, Float> HEIGHT = createField(DSL.name("height"), SQLDataType.REAL.nullable(false), this, "");
+    public final TableField<SourceCharacteristicsRecord, Integer> HEIGHT = createField(DSL.name("height"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>source_characteristics.spread</code>.
      */
-    public final TableField<SourceCharacteristicsRecord, Float> SPREAD = createField(DSL.name("spread"), SQLDataType.REAL.nullable(false), this, "");
+    public final TableField<SourceCharacteristicsRecord, Integer> SPREAD = createField(DSL.name("spread"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>source_characteristics.emission_diurnal_variation</code>.

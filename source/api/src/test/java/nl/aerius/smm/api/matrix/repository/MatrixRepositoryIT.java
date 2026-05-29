@@ -92,7 +92,7 @@ class MatrixRepositoryIT {
                 SOURCE_CHARACTERISTICS.HEIGHT,
                 SOURCE_CHARACTERISTICS.SPREAD,
                 SOURCE_CHARACTERISTICS.EMISSION_DIURNAL_VARIATION)
-            .values(SOURCE_CHARACTERISTIC_ID, 10f, 1f, 2f, (short) 1));
+            .values(SOURCE_CHARACTERISTIC_ID, 10, 1, 2, (short) 1));
     insertIfAbsent(
         MESH_POINTS,
         MESH_POINTS.MESH_POINT_ID.eq(MESH_POINT_ID),
