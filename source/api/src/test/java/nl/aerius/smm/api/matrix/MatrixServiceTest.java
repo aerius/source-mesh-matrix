@@ -30,7 +30,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
@@ -71,18 +73,14 @@ class MatrixServiceTest {
   @Mock
   private MatrixRepository matrixRepository;
 
-  private final MatrixCellMapper matrixCellMapper = new MatrixCellMapper();
+  @Spy
+  private MatrixCellMapper matrixCellMapper = new MatrixCellMapper();
 
+  @InjectMocks
   private MatrixService matrixService;
 
   @BeforeEach
   void setUp() {
-    matrixService = new MatrixService(
-        calculationService,
-        matrixQueryResolver,
-        matrixCellExpander,
-        matrixCellMapper,
-        matrixRepository);
     when(matrixQueryResolver.resolve(any())).thenReturn(SAMPLE_RESOLVED);
   }
 
