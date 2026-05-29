@@ -35,6 +35,6 @@ docker run -d -p <host-port>:<container-port> --restart unless-stopped <image-na
 # For example, to run the api on port 8085:
 docker run -d -p 8085:8080 --restart unless-stopped api:latest
 
-# Or ClickHouse on the default HTTP port for both JDBC and the Play UI:
+# Or ClickHouse on the default HTTP port for both JDBC and the Play UI (empty smm database; no tables):
 docker run -d -p 8123:8123 --restart unless-stopped database:latest
 ```

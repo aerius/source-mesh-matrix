@@ -38,6 +38,9 @@
     <generate-jooq.schema>smm</generate-jooq.schema>
     <generate-jooq.username>aerius</generate-jooq.username>
     <generate-jooq.password>aerius</generate-jooq.password>
+    <flyway-database-clickhouse.version>10.24.0</flyway-database-clickhouse.version>
+    <!-- Flyway Maven plugin (jdbc:clickhouse); Spring/jOOQ use jdbc:ch:http -->
+    <codegen.flyway.url>jdbc:clickhouse://localhost:8123/${generate-jooq.schema}</codegen.flyway.url>
   </properties>
 
   <dependencies>
@@ -58,12 +61,21 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
 
     <!-- Database dependencies -->
     <dependency>
       <groupId>com.clickhouse</groupId>
       <artifactId>clickhouse-jdbc</artifactId>
       <version>${clickhouse-jdbc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-clickhouse</artifactId>
+      <version>${flyway-database-clickhouse.version}</version>
     </dependency>
 
     <!-- Dependencies for generated code -->
@@ -225,6 +237,39 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-clickhouse</artifactId>
+                <version>${flyway-database-clickhouse.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.clickhouse</groupId>
+                <artifactId>clickhouse-jdbc</artifactId>
+                <version>${clickhouse-jdbc.version}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <url>${codegen.flyway.url}</url>
+              <user>${generate-jooq.username}</user>
+              <password>${generate-jooq.password}</password>
+              <locations>
+                <location>filesystem:src/main/resources/db/migration</location>
+              </locations>
+            </configuration>
+            <executions>
+              <execution>
+                <id>flyway-migrate</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>migrate</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen-maven</artifactId>
             <version>${jooq.version}</version>
@@ -247,6 +292,7 @@
                 <database>
                   <name>org.jooq.meta.clickhouse.ClickHouseDatabase</name>
                   <includes>.*</includes>
+                  <excludes>flyway_schema_history</excludes>
                   <schemata>
                     <schema>
                       <inputSchema>${generate-jooq.schema}</inputSchema>

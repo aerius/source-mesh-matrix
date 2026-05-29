@@ -17,6 +17,8 @@
 package nl.aerius.smm.api;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -31,7 +33,10 @@ import nl.aerius.smm.api.web.MatrixQueryResourceLinks;
  * {@link org.springframework.boot.SpringBootConfiguration} (which would break {@code @WebMvcTest} discovery).
  */
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = {
+    DataSourceAutoConfiguration.class,
+    FlywayAutoConfiguration.class
+})
 @ComponentScan(basePackages = {
     "nl.aerius.smm.api.catalog.mapper",
     "nl.aerius.smm.api.query.mapper",

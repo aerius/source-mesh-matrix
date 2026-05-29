@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import nl.aerius.smm.api.catalog.model.CalculationVersion;
@@ -59,6 +60,7 @@ import nl.aerius.smm.api.matrix.service.MatrixService;
 import nl.aerius.smm.api.query.model.QueryRequest;
 
 @SpringBootTest(classes = MatrixCalculationIT.TestConfiguration.class)
+@TestPropertySource(properties = "spring.flyway.enabled=true")
 class MatrixCalculationIT {
 
   @Configuration

@@ -6,7 +6,7 @@ package nl.aerius.smm.api.generated.jooq.tables.records;
 
 import nl.aerius.smm.api.generated.jooq.tables.Matrix;
 
-import org.jooq.Record6;
+import org.jooq.Record7;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -135,8 +135,8 @@ public class MatrixRecord extends UpdatableRecordImpl<MatrixRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record6<Short, Short, Integer, Short, Integer, Integer> key() {
-        return (Record6) super.key();
+    public Record7<Short, Short, Short, Integer, Short, Integer, Integer> key() {
+        return (Record7) super.key();
     }
 
     // -------------------------------------------------------------------------

@@ -10,7 +10,4 @@ compose
 # Ignore generated Dockerfiles (from templates found in common)
 common/api/Dockerfile
 
-# Ignore source folders
-common/database/source
-
 # Ignore generated script files
