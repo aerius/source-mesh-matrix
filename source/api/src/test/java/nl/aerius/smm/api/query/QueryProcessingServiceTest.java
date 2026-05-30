@@ -22,6 +22,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -34,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskRejectedException;
 
+import nl.aerius.smm.api.config.QueryProperties;
 import nl.aerius.smm.api.exception.QueueFullException;
 import nl.aerius.smm.api.exception.ResultNotReadyException;
 import nl.aerius.smm.api.exception.TaskNotFoundException;
@@ -49,15 +54,23 @@ import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 @ExtendWith(MockitoExtension.class)
 class QueryProcessingServiceTest {
 
+  private static final Duration RETENTION = Duration.ofHours(1);
+  private static final Instant START = Instant.parse("2026-05-30T10:00:00Z");
+
   @Mock
   private MatrixService matrixService;
 
+  private MutableClock clock;
   private QueryProcessingService service;
 
   @BeforeEach
   void setUp() {
-    // Synchronous executor
-    service = new QueryProcessingService(Runnable::run, matrixService);
+    clock = new MutableClock(START);
+    service = new QueryProcessingService(
+        Runnable::run,
+        matrixService,
+        clock,
+        testQueryProperties());
   }
 
   @Test
@@ -103,7 +116,7 @@ class QueryProcessingServiceTest {
   void testResultNotReady() {
     final List<Runnable> pending = new ArrayList<>();
     final Executor deferred = pending::add;
-    service = new QueryProcessingService(deferred, matrixService);
+    service = new QueryProcessingService(deferred, matrixService, clock, testQueryProperties());
 
     final String id = service.create(sampleRequest());
 
@@ -125,7 +138,7 @@ class QueryProcessingServiceTest {
     final Executor rejecting = command -> {
       throw new TaskRejectedException("simulated full queue");
     };
-    service = new QueryProcessingService(rejecting, matrixService);
+    service = new QueryProcessingService(rejecting, matrixService, clock, testQueryProperties());
 
     final QueueFullException qf = assertThrows(
         QueueFullException.class,
@@ -146,6 +159,65 @@ class QueryProcessingServiceTest {
         "matrixService.fetchMatrixResults throws -> task should end FAILED");
   }
 
+  @Test
+  void testPurgeRemovesFailedTaskAfterRetention() {
+    when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
+
+    final String id = service.create(sampleRequest());
+    assertEquals(QueryStatus.FAILED, service.getStatus(id));
+
+    clock.advance(RETENTION.plusSeconds(1));
+    service.purgeExpiredTerminalTasks();
+
+    assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
+        "failed task past retention -> getStatus should throw TaskNotFoundException");
+  }
+
+  @Test
+  void testPurgeRemovesRejectedTaskAfterRetention() {
+    final Executor rejecting = command -> {
+      throw new TaskRejectedException("simulated full queue");
+    };
+    service = new QueryProcessingService(rejecting, matrixService, clock, testQueryProperties());
+
+    final QueueFullException qf = assertThrows(QueueFullException.class, () -> service.create(sampleRequest()));
+    final String taskId = qf.getTaskId();
+
+    clock.advance(RETENTION.plusSeconds(1));
+    service.purgeExpiredTerminalTasks();
+
+    assertThrows(TaskNotFoundException.class, () -> service.getStatus(taskId),
+        "rejected task past retention -> getStatus should throw TaskNotFoundException");
+  }
+
+  @Test
+  void testPurgeRemovesCompletedTaskNotFetchedAfterRetention() {
+    when(matrixService.fetchMatrixResults(any())).thenReturn(List.of(sampleRecord()));
+
+    final String id = service.create(sampleRequest());
+    assertEquals(QueryStatus.COMPLETED, service.getStatus(id));
+
+    clock.advance(RETENTION.plusSeconds(1));
+    service.purgeExpiredTerminalTasks();
+
+    assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
+        "completed task not fetched past retention -> getStatus should throw TaskNotFoundException");
+  }
+
+  @Test
+  void testPurgeKeepsTerminalTaskBeforeRetention() {
+    when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
+
+    final String id = service.create(sampleRequest());
+    assertEquals(QueryStatus.FAILED, service.getStatus(id));
+
+    clock.advance(RETENTION.minusSeconds(1));
+    service.purgeExpiredTerminalTasks();
+
+    assertEquals(QueryStatus.FAILED, service.getStatus(id),
+        "failed task within retention -> getStatus should still return FAILED");
+  }
+
   private static QueryRequest sampleRequest() {
     return new QueryRequest(
         "v1",
@@ -158,5 +230,41 @@ class QueryProcessingServiceTest {
 
   private static MatrixCell sampleRecord() {
     return new MatrixCell(new Point(3, 4), new Point(1, 2), "NOx", "concentration", 1.5);
+  }
+
+  private static QueryProperties testQueryProperties() {
+    return new QueryProperties(
+        new QueryProperties.ExecutorProperties(3, 10, 100, "req-"),
+        new QueryProperties.TaskProperties(RETENTION, Duration.ofMinutes(15)));
+  }
+
+  /** Fixed UTC {@link Clock} for tests; use {@link #advance} to simulate task retention expiry without sleeping. */
+  private static final class MutableClock extends Clock {
+
+    private Instant instant;
+
+    private MutableClock(final Instant instant) {
+      this.instant = instant;
+    }
+
+    /** Moves the clock forward so {@link QueryProcessingService#purgeExpiredTerminalTasks()} sees expired tasks. */
+    void advance(final Duration duration) {
+      instant = instant.plus(duration);
+    }
+
+    @Override
+    public ZoneOffset getZone() {
+      return ZoneOffset.UTC;
+    }
+
+    @Override
+    public Clock withZone(final java.time.ZoneId zone) {
+      return this;
+    }
+
+    @Override
+    public Instant instant() {
+      return instant;
+    }
   }
 }

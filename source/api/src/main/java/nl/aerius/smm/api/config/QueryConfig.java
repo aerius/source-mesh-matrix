@@ -16,23 +16,26 @@
  */
 package nl.aerius.smm.api.config;
 
+import java.time.Clock;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableAsync
-@EnableConfigurationProperties(AsyncConfig.AsyncProperties.class)
-public class AsyncConfig {
+@EnableScheduling
+@EnableConfigurationProperties(QueryProperties.class)
+public class QueryConfig {
 
   @Bean
-  public Executor requestExecutor(final AsyncProperties properties) {
+  public Executor requestExecutor(final QueryProperties queryProperties) {
+    final QueryProperties.ExecutorProperties properties = queryProperties.executor();
     final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(properties.corePoolSize());
@@ -46,11 +49,8 @@ public class AsyncConfig {
     return executor;
   }
 
-  @ConfigurationProperties(prefix = "aerius.async")
-  public record AsyncProperties(
-      int corePoolSize,
-      int maxPoolSize,
-      int queueCapacity,
-      String threadNamePrefix
-  ) {}
+  @Bean
+  public Clock clock() {
+    return Clock.systemUTC();
+  }
 }

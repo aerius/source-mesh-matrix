@@ -16,6 +16,7 @@
  */
 package nl.aerius.smm.api.query.model;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,13 +27,15 @@ public record QueryTask(
     String id,
     QueryRequest request,
     QueryStatus status,
-    List<MatrixCell> results
+    List<MatrixCell> results,
+    Instant terminalAt
 ) {
   /** Create task. TaskId will be generated and status is set to null. */
   public static QueryTask create(final QueryRequest request) {
     return new QueryTask(
         UUID.randomUUID().toString(),
         request,
+        null,
         null,
         null);
   }
@@ -43,8 +46,8 @@ public record QueryTask(
   }
 
   /** Task REJECTED */
-  public QueryTask rejected() {
-    return withStatus(QueryStatus.REJECTED);
+  public QueryTask rejected(final Instant terminalAt) {
+    return new QueryTask(id, request, QueryStatus.REJECTED, results, terminalAt);
   }
 
   /** Task picked up for PROCESSING */
@@ -53,16 +56,16 @@ public record QueryTask(
   }
 
   /** Task COMPLETED */
-  public QueryTask complete(final List<MatrixCell> result) {
-    return new QueryTask(id, request, QueryStatus.COMPLETED, result);
+  public QueryTask complete(final List<MatrixCell> result, final Instant terminalAt) {
+    return new QueryTask(id, request, QueryStatus.COMPLETED, result, terminalAt);
   }
 
   /** Task FAILED during processing */
-  public QueryTask failed() {
-    return withStatus(QueryStatus.FAILED);
+  public QueryTask failed(final Instant terminalAt) {
+    return new QueryTask(id, request, QueryStatus.FAILED, results, terminalAt);
   }
 
   private QueryTask withStatus(final QueryStatus status) {
-    return new QueryTask(id, request, status, results);
+    return new QueryTask(id, request, status, results, terminalAt);
   }
 }
