@@ -25,6 +25,30 @@ mvn spring-boot:run
 
 Or using property: `aerius.flyway.dummy-data.enabled` (default `false`).
 
+#### Example matrix query request (dummy data)
+
+`POST /api/v1/matrix/queries` — body matches `db/migration/dummy-data`:
+
+```json
+{
+  "calculation_version": "2025.2",
+  "substances": ["NOx"],
+  "result_types": ["Deposition"],
+  "source_characteristics": {
+    "height": 10,
+    "heat_content": 1050,
+    "spread": 10,
+    "emission_diurnal_variation": 2
+  },
+  "mesh_points": [{ "x": 100001, "y": 400001 }],
+  "source_points": [{ "x": 100, "y": 200 }]
+}
+```
+
+Status: `GET /api/v1/matrix/queries/{queryId}`
+
+Result: `GET /api/v1/matrix/queries/{queryId}/result` (one-shot; task removed after 200)
+
 ### Code generation
 
 #### Generate OpenAPI code
