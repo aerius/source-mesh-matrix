@@ -14,7 +14,16 @@ Build, run, generate code, and test from `source/api`.
 mvn spring-boot:run
 ```
 
-Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`). Flyway applies schema migrations from `src/main/resources/db/migration/` on startup.
+Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`). Flyway applies baseline from `src/main/resources/db/migration/baseline/` on startup.
+
+And optional catalog dummy data from `src/main/resources/db/migration/dummy-data/` when enabled:
+
+```bash
+export AERIUS_FLYWAY_DUMMY_DATA_ENABLED=true
+mvn spring-boot:run
+```
+
+Or using property: `aerius.flyway.dummy-data.enabled` (default `false`).
 
 ### Code generation
 

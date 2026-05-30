@@ -53,3 +53,5 @@ services:
         value: ${DATABASE_PASSWORD}
       - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
         value: com.clickhouse.jdbc.ClickHouseDriver
+      - name: AERIUS_FLYWAY_DUMMY_DATA_ENABLED
+        value: "true"
