@@ -254,7 +254,7 @@
               <user>${generate-jooq.username}</user>
               <password>${generate-jooq.password}</password>
               <locations>
-                <location>filesystem:src/main/resources/db/migration/baseline</location>
+                <location>filesystem:src/main/resources/db/migration</location>
               </locations>
             </configuration>
             <executions>
