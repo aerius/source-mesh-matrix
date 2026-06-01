@@ -68,7 +68,7 @@ Surefire `test` phase only; `*IT.java` is excluded. No ClickHouse required.
 
 ```bash
 docker run -d -p 8123:8123 --restart unless-stopped database:latest
-mvn verify
+mvn verify -Pintegration-tests
 ```
 
-`mvn verify` runs unit tests (Surefire) then integration tests (Failsafe). Database ITs need ClickHouse on `localhost:8123` ([build images](../../docker/README.md); database `smm`, user `aerius`). The Docker image starts only the server. [`MatrixRepositoryIT`](src/test/java/nl/aerius/smm/api/matrix/repository/MatrixRepositoryIT.java) uses `@ActiveProfiles("test")` and `application-test.properties` so Flyway creates the schema on startup; JDBC settings come from main `application.properties`.
+`mvn verify` runs unit tests (Surefire) only. Add `-Pintegration-tests` to run `*IT.java` (Failsafe). Database ITs need ClickHouse on `localhost:8123` ([build images](../../docker/README.md); database `smm`, user `aerius`). The Docker image starts only the server. [`MatrixRepositoryIT`](src/test/java/nl/aerius/smm/api/matrix/repository/MatrixRepositoryIT.java) uses `@ActiveProfiles("test")` and `application-test.properties` so Flyway creates the schema on startup; JDBC settings come from main `application.properties`.
