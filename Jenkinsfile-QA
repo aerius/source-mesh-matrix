@@ -1,7 +1,7 @@
 @Library('cicd-scripts')
 
-def PIPELINE_AGENT_LABEL = 'PullRequestChecker'
-def DOCKER_MAVEN_IMAGE   = 'maven:3-eclipse-temurin-21'
+def PIPELINE_AGENT_LABEL    = 'PullRequestChecker'
+def DOCKER_MAVEN_IMAGE      = 'maven:3-eclipse-temurin-21'
 def DOCKER_CLICKHOUSE_IMAGE = "${env.AERIUS_REGISTRY_URL ?: ''}database:${env.AERIUS_IMAGE_TAG ?: 'latest'}"
 
 cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
