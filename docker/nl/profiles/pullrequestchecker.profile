@@ -1,1 +1,1 @@
-SERVICES=(api)
+SERVICES=(database api)
