@@ -1,54 +1,22 @@
 @Library('cicd-scripts')
 
-def PIPELINE_AGENT_LABEL     = 'PullRequestChecker'
-def DOCKER_MAVEN_IMAGE       = 'maven:3-eclipse-temurin-21'
-def DOCKER_CLICKHOUSE_IMAGE  = 'database:latest'
+def PIPELINE_AGENT_LABEL = 'PullRequestChecker'
+def DOCKER_MAVEN_IMAGE   = 'maven:3-eclipse-temurin-21'
 
 cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
 
-  cicdStage('Build Maven') {
+  cicdStage('Sonar') {
     docker.image(DOCKER_MAVEN_IMAGE).inside {
 
-      sh '''
-        mvn -f source/pom.xml clean verify -Pdeploy --no-transfer-progress
-      '''
+      withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
 
-    }
-  }
+        sh '''
+          mvn -f source/pom.xml \
+          clean verify org.sonarsource.scanner.maven:sonar-maven-plugin::sonar -Pdeploy,sonar --no-transfer-progress \
+          -Dsonar.java.binaries=target -Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=PR-${CHANGE_ID} -Dsonar.pullrequest.base=${CHANGE_TARGET}
+        '''
 
-  cicdStage('Build Docker') {
-    sh '''
-      cd docker
-      PROFILE=pullrequestchecker "${CICD_SCRIPTS_DIR}"/docker/images_v1.0.sh --no-push
-    '''
-  }
-
-  cicdStage('Sonar') {
-    docker.image(DOCKER_CLICKHOUSE_IMAGE)
-        .withRun('-P') { c ->
-
-      // Get random port from the database container
-      // Random ports are important for running multiple jobs in parallel because the jobs must not use the same port on the host
-      // Then wait until postgres is up
-      sh '''
-        port=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8123/tcp") 0).HostPort}}' ''' + c.id + ''')
-        while ! curl "http://localhost:${port}/" 2>&1 | grep '52'; do echo 'waiting for ClickHouse'; sleep 1; done;
-      '''
-
-      docker.image(DOCKER_MAVEN_IMAGE).inside("--link ${c.id}:database") {
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-
-          sh '''
-            mvn -f source/pom.xml \
-              clean verify org.sonarsource.scanner.maven:sonar-maven-plugin::sonar \
-              -Pdeploy,sonar,failsafe --no-transfer-progress \
-              -Dspring.datasource.url=jdbc:ch:http://database:8123/smm -Dspring.datasource.username=aerius -Dspring.datasource.password=aerius \
-              -Dsonar.java.binaries=target -Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=PR-${CHANGE_ID} -Dsonar.pullrequest.base=${CHANGE_TARGET}
-          '''
-
-        }
       }
     }
   }
-
 }
