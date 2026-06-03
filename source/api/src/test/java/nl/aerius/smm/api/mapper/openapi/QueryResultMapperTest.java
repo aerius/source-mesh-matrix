@@ -14,30 +14,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.query.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryResultResponse;
-import nl.aerius.smm.api.model.MatrixResultRecord;
-import nl.aerius.smm.api.model.Point;
-import nl.aerius.smm.api.model.QueryRequest;
-import nl.aerius.smm.api.model.QueryResultResponse;
-import nl.aerius.smm.api.model.SourceCharacteristics;
+import nl.aerius.smm.api.matrix.model.MatrixCell;
+import nl.aerius.smm.api.common.Point;
+import nl.aerius.smm.api.query.model.QueryRequest;
+import nl.aerius.smm.api.query.model.QueryResultResponse;
+import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
-@SpringBootTest(classes = TestApplication.class)
 class QueryResultMapperTest {
 
-  @Autowired
   private QueryResultMapper queryResultMapper;
+
+  @BeforeEach
+  void setUp() {
+    final QueryResultMapperImpl impl = new QueryResultMapperImpl();
+    ReflectionTestUtils.setField(impl, "queryRequestMapper", Mappers.getMapper(QueryRequestMapper.class));
+    queryResultMapper = impl;
+  }
 
   @Test
   void testMapQueryResultResponseToRest() {
@@ -45,21 +50,15 @@ class QueryResultMapperTest {
         "2030",
         List.of("SO2"),
         List.of("concentration"),
-        new SourceCharacteristics(null, 5.0d, 1.1d, 0.2d, 1),
+        new SourceCharacteristics(null, 5, 1, 1, 1),
         List.of(new Point(0, 0)),
         List.of(new Point(1, 1)));
-    final MatrixResultRecord r1 = new MatrixResultRecord(
+    final MatrixCell r1 = new MatrixCell(
         new Point(1, 1),
         new Point(2, 3),
         "NOx",
         "concentration",
         1.25);
-    final MatrixResultRecord r2 = new MatrixResultRecord(
-        new Point(4, 5),
-        new Point(6, 7),
-        "NH3",
-        "deposition",
-        1.0d);
     final QueryResultResponse response = new QueryResultResponse(request, List.of(r1));
 
     final RestMatrixQueryResultResponse rest = queryResultMapper.toRestMatrixQueryResultResponse(response);
@@ -70,11 +69,11 @@ class QueryResultMapperTest {
         "domain -> REST nested query should preserve substances");
     assertEquals(List.of("concentration"), rest.getQuery().getResultTypes(),
         "domain -> REST nested query should preserve resultTypes");
-    assertEquals(5.0d, rest.getQuery().getSourceCharacteristics().getHeight(),
+    assertEquals(5, rest.getQuery().getSourceCharacteristics().getHeight(),
         "domain -> REST nested query should preserve sourceCharacteristics height");
-    assertEquals(1.1d, rest.getQuery().getSourceCharacteristics().getHeatContent(),
+    assertEquals(1, rest.getQuery().getSourceCharacteristics().getHeatContent(),
         "domain -> REST nested query should preserve sourceCharacteristics heatContent");
-    assertEquals(0.2d, rest.getQuery().getSourceCharacteristics().getSpread(),
+    assertEquals(1, rest.getQuery().getSourceCharacteristics().getSpread(),
         "domain -> REST nested query should preserve sourceCharacteristics spread");
     assertEquals(1, rest.getQuery().getSourceCharacteristics().getEmissionDiurnalVariation(),
         "domain -> REST nested query should preserve sourceCharacteristics emissionDiurnalVariation");
@@ -97,6 +96,6 @@ class QueryResultMapperTest {
     assertNull(queryResultMapper.toRestMatrixQueryResultResponse(null),
         "null QueryResultResponse -> REST should be null");
     assertNull(queryResultMapper.toRestMatrixResultRecord(null),
-        "null MatrixResultRecord -> REST should be null");
+        "null MatrixCell -> REST should be null");
   }
 }

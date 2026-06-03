@@ -13,8 +13,12 @@ output "services" {
 
       REGISTRY_URL                          = var.ecr_directory == null ? "${var.ecr_repo}/${lower(var.environment)}" : "${var.ecr_repo}/${var.ecr_directory}",
 
-      SERVICE_DISCOVERY_PRIVATE_DNS         = "${lower(local.name_prefix)}-int.local",
+      DATABASE_HOSTNAME                     = "database.${lower(local.name_prefix)}-int.local",
+      DATABASE_NAME                         = "smm",
+      DATABASE_USERNAME                     = "aerius",
+      DATABASE_PASSWORD                     = "aerius",
 
+      SERVICE_DISCOVERY_PRIVATE_DNS         = "${lower(local.name_prefix)}-int.local",
 
   })).services
 }

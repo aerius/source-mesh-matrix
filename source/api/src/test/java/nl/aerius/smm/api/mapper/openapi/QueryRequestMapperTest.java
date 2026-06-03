@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.query.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -22,20 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 
-import nl.aerius.smm.api.TestApplication;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryRequest;
-import nl.aerius.smm.api.model.Point;
-import nl.aerius.smm.api.model.QueryRequest;
-import nl.aerius.smm.api.model.SourceCharacteristics;
+import nl.aerius.smm.api.common.Point;
+import nl.aerius.smm.api.query.model.QueryRequest;
+import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 
-@SpringBootTest(classes = TestApplication.class)
 class QueryRequestMapperTest {
 
-  @Autowired
-  private QueryRequestMapper mapper;
+  private final QueryRequestMapper mapper = Mappers.getMapper(QueryRequestMapper.class);
 
   @Test
   void testMapRoundTrip() {
@@ -87,9 +83,9 @@ class QueryRequestMapperTest {
   private static QueryRequest sampleQueryRequest() {
     final SourceCharacteristics sourceCharacteristics = new SourceCharacteristics(
         (short) 99,
-        15.5d,
-        2.25d,
-        0.75d,
+        16,
+        2,
+        1,
         3);
     return new QueryRequest(
         "2024",

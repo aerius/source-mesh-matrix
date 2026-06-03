@@ -17,6 +17,20 @@
 
 services:
 
+  database:
+    image: ${REGISTRY_URL}/database:${APP_VERSION}
+    cpu: 4096
+    memory: 7692
+    desired_count: 1
+    disable_rolling_updates: true
+    environment:
+      - name: CLICKHOUSE_DB
+        value: ${DATABASE_NAME}
+      - name: CLICKHOUSE_USER
+        value: ${DATABASE_USERNAME}
+      - name: CLICKHOUSE_PASSWORD
+        value: ${DATABASE_PASSWORD}
+
   api:
     image: ${REGISTRY_URL}/api:${APP_VERSION}
     cpu: 4096
@@ -31,3 +45,11 @@ services:
         value: ${APP_TIMEZONE}
       - name: SERVER_PORT
         value: 8080
+      - name: SPRING_DATASOURCE_URL
+        value: jdbc:ch:http://${DATABASE_HOSTNAME}:8123/${DATABASE_NAME}
+      - name: SPRING_DATASOURCE_USERNAME
+        value: ${DATABASE_USERNAME}
+      - name: SPRING_DATASOURCE_PASSWORD
+        value: ${DATABASE_PASSWORD}
+      - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: com.clickhouse.jdbc.ClickHouseDriver

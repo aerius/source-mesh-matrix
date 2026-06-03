@@ -5,26 +5,18 @@ def DOCKER_MAVEN_IMAGE   = 'maven:3-eclipse-temurin-21'
 
 cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
 
-  cicdStage('Build Maven') {
+  cicdStage('Sonar') {
     docker.image(DOCKER_MAVEN_IMAGE).inside {
 
       withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
 
         sh '''
-          mvn -f source/pom.xml clean verify org.sonarsource.scanner.maven:sonar-maven-plugin::sonar \
-            -Pdeploy,sonar --no-transfer-progress -Dsonar.java.binaries=target \
-            -Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=PR-${CHANGE_ID} -Dsonar.pullrequest.base=${CHANGE_TARGET}
+          mvn -f source/pom.xml \
+          clean verify org.sonarsource.scanner.maven:sonar-maven-plugin::sonar -Pdeploy,sonar --no-transfer-progress \
+          -Dsonar.java.binaries=target -Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=PR-${CHANGE_ID} -Dsonar.pullrequest.base=${CHANGE_TARGET}
         '''
 
       }
     }
   }
-
-  cicdStage('Build Docker') {
-    sh '''
-      cd docker
-      PROFILE=pullrequestchecker "${CICD_SCRIPTS_DIR}"/docker/images_v1.0.sh --no-push
-    '''
-  }
-
 }

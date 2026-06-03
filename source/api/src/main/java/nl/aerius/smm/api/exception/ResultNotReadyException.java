@@ -16,7 +16,7 @@
  */
 package nl.aerius.smm.api.exception;
 
-import nl.aerius.smm.api.model.QueryStatus;
+import nl.aerius.smm.api.query.model.QueryStatus;
 
 public class ResultNotReadyException extends RuntimeException {
 

@@ -14,24 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-package nl.aerius.smm.api.mapper.openapi;
+package nl.aerius.smm.api.query.mapper.openapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
+import nl.aerius.smm.api.config.EndpointsConfig.EndpointsProperties;
 import nl.aerius.smm.api.generated.openapi.model.RestMatrixQueryStatusResponse;
-import nl.aerius.smm.api.TestApplication;
-import nl.aerius.smm.api.model.QueryStatus;
+import nl.aerius.smm.api.query.model.QueryStatus;
+import nl.aerius.smm.api.web.MatrixQueryResourceLinks;
 
-@SpringBootTest(classes = TestApplication.class)
 class QueryTaskMapperTest {
 
-  @Autowired
   private QueryTaskMapper mapper;
+
+  @BeforeEach
+  void setUp() {
+    mapper = new QueryTaskMapper(new MatrixQueryResourceLinks(new EndpointsProperties("/api/v1")));
+  }
 
   @Test
   void testMapRoundTrip() {

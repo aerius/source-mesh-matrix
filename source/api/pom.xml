@@ -18,7 +18,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>nl.aerius</groupId>
@@ -31,7 +31,16 @@
 
   <properties>
     <smm.api.generated.base>nl.aerius.smm.api.generated</smm.api.generated.base>
+    <jooq.version>3.21.1</jooq.version>
+    <clickhouse-jdbc.version>0.8.6</clickhouse-jdbc.version>
     <mapstruct.version>1.6.3</mapstruct.version>
+    <generate-jooq.url>jdbc:ch:http://localhost:8123/smm</generate-jooq.url>
+    <generate-jooq.schema>smm</generate-jooq.schema>
+    <generate-jooq.username>aerius</generate-jooq.username>
+    <generate-jooq.password>aerius</generate-jooq.password>
+    <flyway-database-clickhouse.version>10.24.0</flyway-database-clickhouse.version>
+    <!-- Flyway Maven plugin (jdbc:clickhouse); Spring/jOOQ use jdbc:ch:http -->
+    <codegen.flyway.url>jdbc:clickhouse://localhost:8123/${generate-jooq.schema}</codegen.flyway.url>
   </properties>
 
   <dependencies>
@@ -48,6 +57,27 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+
+    <!-- Database dependencies -->
+    <dependency>
+      <groupId>com.clickhouse</groupId>
+      <artifactId>clickhouse-jdbc</artifactId>
+      <version>${clickhouse-jdbc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-clickhouse</artifactId>
+      <version>${flyway-database-clickhouse.version}</version>
+    </dependency>
+
     <!-- Dependencies for generated code -->
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
@@ -58,6 +88,11 @@
       <artifactId>jackson-databind-nullable</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>${jooq.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
@@ -171,4 +206,85 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>generate-jooq</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-clickhouse</artifactId>
+                <version>${flyway-database-clickhouse.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>com.clickhouse</groupId>
+                <artifactId>clickhouse-jdbc</artifactId>
+                <version>${clickhouse-jdbc.version}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <url>${codegen.flyway.url}</url>
+              <user>${generate-jooq.username}</user>
+              <password>${generate-jooq.password}</password>
+              <locations>
+                <location>filesystem:src/main/resources/db/migration</location>
+              </locations>
+            </configuration>
+            <executions>
+              <execution>
+                <id>flyway-migrate</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>migrate</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen-maven</artifactId>
+            <version>${jooq.version}</version>
+            <executions>
+              <execution>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <jdbc>
+                <driver>com.clickhouse.jdbc.ClickHouseDriver</driver>
+                <url>${generate-jooq.url}</url>
+                <user>${generate-jooq.username}</user>
+                <password>${generate-jooq.password}</password>
+              </jdbc>
+              <generator>
+                <database>
+                  <name>org.jooq.meta.clickhouse.ClickHouseDatabase</name>
+                  <includes>.*</includes>
+                  <excludes>flyway_schema_history</excludes>
+                  <schemata>
+                    <schema>
+                      <inputSchema>${generate-jooq.schema}</inputSchema>
+                      <outputSchemaToDefault>true</outputSchemaToDefault>
+                    </schema>
+                  </schemata>
+                </database>
+                <target>
+                  <packageName>${smm.api.generated.base}.jooq</packageName>
+                  <directory>${project.basedir}/src/main/java</directory>
+                </target>
+              </generator>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

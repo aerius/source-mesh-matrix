@@ -15,8 +15,8 @@
   along with this program. If not, see http://www.gnu.org/licenses/.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -103,14 +103,7 @@
 
   <profiles>
     <profile>
-      <id>all</id>
-      <modules>
-        <module>api</module>
-        <!-- <module>-database</module> -->
-      </modules>
-    </profile>
-    <profile>
-      <id>all_except_databases</id>
+      <id>default</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -118,13 +111,13 @@
         <module>api</module>
       </modules>
     </profile>
+
     <profile>
       <id>sonar</id>
       <modules>
         <module>api</module>
       </modules>
     </profile>
-    
     <profile>
       <id>failsafe</id>
       <build>
