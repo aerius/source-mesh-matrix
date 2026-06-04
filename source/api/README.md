@@ -14,7 +14,14 @@ Build, run, generate code, and test from `source/api`.
 mvn spring-boot:run
 ```
 
-Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`). Flyway applies schema migrations from `src/main/resources/db/migration/` on startup.
+Requires ClickHouse on `localhost:8123` (database
+`smm`, user `aerius`; for instance by running the docker [image](../../docker/README.md)).
+
+Flyway applies schema migrations from `src/main/resources/db/migration/` on
+startup.
+
+Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.terminal-retention` (default `24h`), `task.cleanup-interval` (
+default `15m`). Terminal tasks not consumed via `/result` are purged after retention.
 
 ### Code generation
 
@@ -32,7 +39,8 @@ Generated sources are written to `target/openapi/`.
 mvn -Pgenerate-jooq generate-sources
 ```
 
-Requires a running ClickHouse. The `generate-jooq` profile runs Flyway migrate before codegen. Flyway Maven uses `jdbc:clickhouse://` (`codegen.flyway.url`); the running API uses `jdbc:ch:http://` for the datasource.
+Requires a running ClickHouse. The `generate-jooq` profile runs Flyway migrate before codegen. Flyway Maven uses `jdbc:clickhouse://` (
+`codegen.flyway.url`); the running API uses `jdbc:ch:http://` for the datasource.
 
 #### Regenerate jOOQ with custom JDBC
 
@@ -62,13 +70,13 @@ Also runs code generation (OpenAPI, etc.) as part of the build.
 mvn test
 ```
 
-Surefire `test` phase only; `*IT.java` is excluded. No ClickHouse required.
+Surefire runs `*Test` / `*Tests` classes only. No ClickHouse required.
 
 #### Run unit tests + integration tests
 
 ```bash
 docker run -d -p 8123:8123 --restart unless-stopped database:latest
-mvn verify -Pintegration-tests
+mvn verify -Pfailsafe
 ```
 
-`mvn verify` runs unit tests (Surefire) only. Add `-Pintegration-tests` to run `*IT.java` (Failsafe). Database ITs need ClickHouse on `localhost:8123` ([build images](../../docker/README.md); database `smm`, user `aerius`). The Docker image starts only the server. [`MatrixRepositoryIT`](src/test/java/nl/aerius/smm/api/matrix/repository/MatrixRepositoryIT.java) uses `@ActiveProfiles("test")` and `application-test.properties` so Flyway creates the schema on startup; JDBC settings come from main `application.properties`.
+Add `-Pfailsafe` to run `*IT.java` (Failsafe). Database ITs need a running ClickHouse instance.

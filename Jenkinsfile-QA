@@ -1,8 +1,8 @@
 @Library('cicd-scripts')
 
-def PIPELINE_AGENT_LABEL     = 'PullRequestChecker'
-def DOCKER_MAVEN_IMAGE       = 'maven:3-eclipse-temurin-21'
-def DOCKER_CLICKHOUSE_IMAGE  = 'database:latest'
+def PIPELINE_AGENT_LABEL    = 'PullRequestChecker'
+def DOCKER_MAVEN_IMAGE      = 'maven:3-eclipse-temurin-21'
+def DOCKER_CLICKHOUSE_IMAGE = "${env.AERIUS_REGISTRY_URL ?: ''}database:${env.AERIUS_IMAGE_TAG ?: 'latest'}"
 
 cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
 
@@ -31,8 +31,7 @@ cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
           sh '''
             mvn -f source/pom.xml \
               clean verify org.sonarsource.scanner.maven:sonar-maven-plugin::sonar -Psonar,failsafe --no-transfer-progress -Dmaven.test.failure.ignore=true \
-              -Dspring.datasource.url=jdbc:ch:http://database:8123/smm -Dspring.datasource.username=aerius -Dspring.datasource.password=aerius \
-              -Dsonar.java.binaries=target -Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=PR-${CHANGE_ID} -Dsonar.pullrequest.base=${CHANGE_TARGET}
+              -Dspring.datasource.url=jdbc:ch:http://database:8123/smm -Dspring.datasource.username=aerius -Dspring.datasource.password=aerius
           '''
 
         }
