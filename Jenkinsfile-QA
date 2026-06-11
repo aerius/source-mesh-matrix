@@ -29,9 +29,7 @@ cicdPipeline(
     docker.image(DOCKER_CLICKHOUSE_IMAGE)
         .withRun('-P') { c ->
 
-      // Get random port environmentScripts : [
-                             FLAG_SETTINGS_SCRIPT  : 'mktemp -u -p . tmp.XXXXXX.envsh'
-                           ]from the database container
+      // Get random port from the database container
       // Random ports are important for running multiple jobs in parallel because the jobs must not use the same port on the host
       // Then wait until postgres is up
       sh '''
