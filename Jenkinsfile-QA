@@ -1,10 +1,22 @@
 @Library('cicd-scripts')
 
-def PIPELINE_AGENT_LABEL    = 'PullRequestChecker'
+def PIPELINE_AGENT_LABEL    = 'QA'
 def DOCKER_MAVEN_IMAGE      = 'maven:3-eclipse-temurin-21'
-def DOCKER_CLICKHOUSE_IMAGE = "${env.AERIUS_REGISTRY_URL ?: ''}database:${env.AERIUS_IMAGE_TAG ?: 'latest'}"
 
-cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
+cicdPipeline(
+  agentLabel                    : PIPELINE_AGENT_LABEL,
+
+  qaJunitEnabled                : !cicdHasFlag('TEST_UNITTESTS_DISABLE'),
+  qaJunitTestResults            : '**/TEST-*.xml',
+
+  environment : [
+    TZ                      : 'Europe/Amsterdam',
+    DOCKER_CLICKHOUSE_IMAGE : "${env.AERIUS_REGISTRY_URL ?: ''}database:${env.AERIUS_IMAGE_TAG ?: 'latest'}"
+  ],
+
+  environmentScripts : [
+    FLAG_SETTINGS_SCRIPT  : 'mktemp -u -p . tmp.XXXXXX.envsh'
+  ]) {
 
   cicdStage('Docker preparation') {
     sh '''
@@ -17,7 +29,9 @@ cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
     docker.image(DOCKER_CLICKHOUSE_IMAGE)
         .withRun('-P') { c ->
 
-      // Get random port from the database container
+      // Get random port environmentScripts : [
+                             FLAG_SETTINGS_SCRIPT  : 'mktemp -u -p . tmp.XXXXXX.envsh'
+                           ]from the database container
       // Random ports are important for running multiple jobs in parallel because the jobs must not use the same port on the host
       // Then wait until postgres is up
       sh '''
