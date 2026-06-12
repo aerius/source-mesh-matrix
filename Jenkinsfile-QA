@@ -11,7 +11,7 @@ cicdPipeline(
   qaJunitTestResults            : '**/TEST-*.xml',
 
   environment : [
-    TZ                      : 'Europe/Amsterdam',
+    TZ                      : 'Europe/Amsterdam'
   ],
 
   environmentScripts : [
@@ -21,7 +21,7 @@ cicdPipeline(
   cicdStage('Docker preparation') {
     sh '''
       cd docker
-      PROFILE=integrationtests "${CICD_SCRIPTS_DIR}"/docker/images_v1.0.sh --no-push
+      PROFILE=integrationtests "${CICD_SCgotRIPTS_DIR}"/docker/images_v1.0.sh --no-push
     '''
   }
 
