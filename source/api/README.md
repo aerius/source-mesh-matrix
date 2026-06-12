@@ -16,8 +16,7 @@ mvn spring-boot:run
 
 Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`; for instance by running the docker [image](../../docker/README.md)).
 
-Flyway applies schema migrations from `src/main/resources/db/migration/` on
-startup.
+Flyway applies schema migrations from `src/main/resources/db/migration/` on startup.
 
 Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.terminal-retention` (default `24h`), `task.cleanup-interval` (default `15m`). Terminal tasks not consumed via `/result` are purged after retention.
 
