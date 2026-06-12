@@ -18,7 +18,8 @@ Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`; for inst
 
 Flyway applies schema migrations from `src/main/resources/db/migration/` on startup.
 
-Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.terminal-retention` (default `24h`), `task.cleanup-interval` (default `15m`). Terminal tasks not consumed via `/result` are purged after retention.
+Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.terminal-retention` (default `24h`),
+`task.cleanup-interval` (default `15m`). Terminal tasks not consumed via `/result` are purged after retention.
 
 ### Code generation
 
@@ -36,8 +37,8 @@ Generated sources are written to `target/openapi/`.
 mvn -Pgenerate-jooq generate-sources
 ```
 
-Requires a running ClickHouse. The `generate-jooq` profile runs Flyway migrate before codegen. Flyway Maven uses `jdbc:clickhouse://` (
-`codegen.flyway.url`); the running API uses `jdbc:ch:http://` for the datasource.
+Requires a running ClickHouse. The `generate-jooq` profile runs Flyway migrate before codegen.
+Flyway Maven uses `jdbc:clickhouse://` (`codegen.flyway.url`); the running API uses `jdbc:ch:http://` for the datasource.
 
 #### Regenerate jOOQ with custom JDBC
 
