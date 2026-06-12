@@ -28,7 +28,7 @@ public record QueryTask(
     QueryRequest request,
     QueryStatus status,
     List<MatrixCell> results,
-    Instant terminalAt
+    Instant endedAt
 ) {
   /** Create task. TaskId will be generated and status is set to null. */
   public static QueryTask create(final QueryRequest request) {
@@ -42,30 +42,26 @@ public record QueryTask(
 
   /** Task ACCEPTED to picked up */
   public QueryTask accepted() {
-    return withStatus(QueryStatus.ACCEPTED);
+    return new QueryTask(id, request, QueryStatus.ACCEPTED, results, endedAt);
   }
 
   /** Task REJECTED */
-  public QueryTask rejected(final Instant terminalAt) {
-    return new QueryTask(id, request, QueryStatus.REJECTED, results, terminalAt);
+  public QueryTask rejected(final Instant endedAt) {
+    return new QueryTask(id, request, QueryStatus.REJECTED, results, endedAt);
   }
 
   /** Task picked up for PROCESSING */
   public QueryTask processing() {
-    return withStatus(QueryStatus.PROCESSING);
+    return new QueryTask(id, request, QueryStatus.PROCESSING, results, endedAt);
   }
 
   /** Task COMPLETED */
-  public QueryTask complete(final List<MatrixCell> result, final Instant terminalAt) {
-    return new QueryTask(id, request, QueryStatus.COMPLETED, result, terminalAt);
+  public QueryTask complete(final List<MatrixCell> result, final Instant endedAt) {
+    return new QueryTask(id, request, QueryStatus.COMPLETED, result, endedAt);
   }
 
   /** Task FAILED during processing */
-  public QueryTask failed(final Instant terminalAt) {
-    return new QueryTask(id, request, QueryStatus.FAILED, results, terminalAt);
-  }
-
-  private QueryTask withStatus(final QueryStatus status) {
-    return new QueryTask(id, request, status, results, terminalAt);
+  public QueryTask failed(final Instant endedAt) {
+    return new QueryTask(id, request, QueryStatus.FAILED, results, endedAt);
   }
 }

@@ -110,7 +110,7 @@ public class QueryProcessingService {
     return new QueryResultResponse(popped.get().request(), popped.get().results());
   }
 
-  /** Removes terminal tasks whose {@link QueryTask#terminalAt()} is older than the configured retention. */
+  /** Removes terminal tasks whose {@link QueryTask#endedAt()} is older than the configured retention. */
   public void purgeExpiredTerminalTasks() {
     final Instant cutoff = clock.instant().minus(terminalRetention);
     final int removed = purgeTasksOlderThan(cutoff);
@@ -123,8 +123,8 @@ public class QueryProcessingService {
     int removed = 0;
     for (final Map.Entry<String, QueryTask> entry : tasks.entrySet()) {
       final QueryTask task = entry.getValue();
-      final Instant terminalAt = task.terminalAt();
-      if (terminalAt != null && !terminalAt.isAfter(cutoff) && tasks.remove(entry.getKey(), task)) {
+      final Instant endedAt = task.endedAt();
+      if (endedAt != null && !endedAt.isAfter(cutoff) && tasks.remove(entry.getKey(), task)) {
         removed++;
       }
     }
