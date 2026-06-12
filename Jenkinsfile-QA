@@ -1,10 +1,22 @@
 @Library('cicd-scripts')
 
-def PIPELINE_AGENT_LABEL    = 'PullRequestChecker'
+def PIPELINE_AGENT_LABEL    = 'QA'
 def DOCKER_MAVEN_IMAGE      = 'maven:3-eclipse-temurin-21'
 def DOCKER_CLICKHOUSE_IMAGE = "${env.AERIUS_REGISTRY_URL ?: ''}database:${env.AERIUS_IMAGE_TAG ?: 'latest'}"
 
-cicdPipeline(agentLabel: PIPELINE_AGENT_LABEL) {
+cicdPipeline(
+  agentLabel                : PIPELINE_AGENT_LABEL,
+
+  qaJunitEnabled            : !cicdHasFlag('TEST_UNITTESTS_DISABLE'),
+  qaJunitTestResults        : '**/TEST-*.xml',
+
+  environment : [
+    TZ                      : 'Europe/Amsterdam'
+  ],
+
+  environmentScripts : [
+    FLAG_SETTINGS_SCRIPT    : 'mktemp -u -p . tmp.XXXXXX.envsh'
+  ]) {
 
   cicdStage('Docker preparation') {
     sh '''
