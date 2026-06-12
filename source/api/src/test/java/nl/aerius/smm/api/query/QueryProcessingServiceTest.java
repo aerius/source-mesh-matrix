@@ -19,13 +19,13 @@ package nl.aerius.smm.api.query;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -60,17 +60,26 @@ class QueryProcessingServiceTest {
   @Mock
   private MatrixService matrixService;
 
-  private MutableClock clock;
+  @Mock
+  private Clock clock;
+
+  private Instant currentTime;
   private QueryProcessingService service;
 
   @BeforeEach
   void setUp() {
-    clock = new MutableClock(START);
+    currentTime = START;
+    lenient().when(clock.instant()).thenAnswer(invocation -> currentTime);
     service = new QueryProcessingService(
         Runnable::run,
         matrixService,
         clock,
         testQueryProperties());
+  }
+
+  /** Moves the mocked clock forward for retention/purge tests. */
+  private void advance(final Duration duration) {
+    currentTime = currentTime.plus(duration);
   }
 
   @Test
@@ -168,7 +177,7 @@ class QueryProcessingServiceTest {
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "matrixService.fetchMatrixResults throws -> task should end FAILED before purge");
 
-    clock.advance(RETENTION.plusSeconds(1));
+    advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
@@ -189,7 +198,7 @@ class QueryProcessingServiceTest {
         "executor rejects submission -> create should throw QueueFullException");
     final String taskId = exception.getTaskId();
 
-    clock.advance(RETENTION.plusSeconds(1));
+    advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(taskId),
@@ -204,7 +213,7 @@ class QueryProcessingServiceTest {
     assertEquals(QueryStatus.COMPLETED, service.getStatus(id),
         "completed task -> getStatus should return COMPLETED before purge");
 
-    clock.advance(RETENTION.plusSeconds(1));
+    advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
@@ -219,7 +228,7 @@ class QueryProcessingServiceTest {
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "failed task -> getStatus should return FAILED before retention expires");
 
-    clock.advance(RETENTION.minusSeconds(1));
+    advance(RETENTION.minusSeconds(1));
     service.purgeExpiredTerminalTasks();
 
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
@@ -244,35 +253,5 @@ class QueryProcessingServiceTest {
     return new QueryProperties(
         new QueryProperties.ExecutorProperties(3, 10, 100, "req-"),
         new QueryProperties.TaskProperties(RETENTION, Duration.ofMinutes(15)));
-  }
-
-  /** Fixed UTC {@link Clock} for tests; use {@link #advance} to simulate task retention expiry without sleeping. */
-  private static final class MutableClock extends Clock {
-
-    private Instant instant;
-
-    private MutableClock(final Instant instant) {
-      this.instant = instant;
-    }
-
-    /** Moves the clock forward so {@link QueryProcessingService#purgeExpiredTerminalTasks()} sees expired tasks. */
-    void advance(final Duration duration) {
-      instant = instant.plus(duration);
-    }
-
-    @Override
-    public ZoneOffset getZone() {
-      return ZoneOffset.UTC;
-    }
-
-    @Override
-    public Clock withZone(final java.time.ZoneId zone) {
-      return this;
-    }
-
-    @Override
-    public Instant instant() {
-      return instant;
-    }
   }
 }
