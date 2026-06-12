@@ -18,8 +18,8 @@ Requires ClickHouse on `localhost:8123` (database `smm`, user `aerius`; for inst
 
 Flyway applies schema migrations from `src/main/resources/db/migration/` on startup.
 
-Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.terminal-retention` (default `24h`),
-`task.cleanup-interval` (default `15m`). Terminal tasks not consumed via `/result` are purged after retention.
+Matrix query settings under `aerius.query`: `executor.*` (async thread pool), `task.ended-retention` (default `24h`),
+`task.cleanup-interval` (default `15m`). Ended tasks not consumed via `/result` are purged after retention.
 
 ### Code generation
 
