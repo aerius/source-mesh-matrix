@@ -1,2 +1,11 @@
+# Build artefacts
 target/
+
+# IntelliJ files
 .idea
+
+# Eclipse files
+.classpath
+.factorypath
+.project
+.settings
