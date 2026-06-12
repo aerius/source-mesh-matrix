@@ -54,7 +54,7 @@ import nl.aerius.smm.api.catalog.model.SourceCharacteristics;
 @ExtendWith(MockitoExtension.class)
 class QueryProcessingServiceTest {
 
-  private static final Duration RETENTION = Duration.ofHours(1);
+  private static final Duration ENDED_RETENTION = Duration.ofHours(1);
   private static final Instant START = Instant.parse("2026-05-30T10:00:00Z");
 
   @Mock
@@ -177,8 +177,8 @@ class QueryProcessingServiceTest {
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "matrixService.fetchMatrixResults throws -> task should end FAILED before purge");
 
-    advance(RETENTION.plusSeconds(1));
-    service.purgeExpiredTerminalTasks();
+    advance(ENDED_RETENTION.plusSeconds(1));
+    service.purgeExpiredEndedTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
         "failed task past retention -> getStatus should throw TaskNotFoundException");
@@ -198,8 +198,8 @@ class QueryProcessingServiceTest {
         "executor rejects submission -> create should throw QueueFullException");
     final String taskId = exception.getTaskId();
 
-    advance(RETENTION.plusSeconds(1));
-    service.purgeExpiredTerminalTasks();
+    advance(ENDED_RETENTION.plusSeconds(1));
+    service.purgeExpiredEndedTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(taskId),
         "rejected task past retention -> getStatus should throw TaskNotFoundException");
@@ -213,23 +213,23 @@ class QueryProcessingServiceTest {
     assertEquals(QueryStatus.COMPLETED, service.getStatus(id),
         "completed task -> getStatus should return COMPLETED before purge");
 
-    advance(RETENTION.plusSeconds(1));
-    service.purgeExpiredTerminalTasks();
+    advance(ENDED_RETENTION.plusSeconds(1));
+    service.purgeExpiredEndedTasks();
 
     assertThrows(TaskNotFoundException.class, () -> service.getStatus(id),
         "completed task not fetched past retention -> getStatus should throw TaskNotFoundException");
   }
 
   @Test
-  void testPurgeKeepsTerminalTaskBeforeRetention() {
+  void testPurgeKeepsEndedTaskBeforeRetention() {
     when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
 
     final String id = service.create(sampleRequest());
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "failed task -> getStatus should return FAILED before retention expires");
 
-    advance(RETENTION.minusSeconds(1));
-    service.purgeExpiredTerminalTasks();
+    advance(ENDED_RETENTION.minusSeconds(1));
+    service.purgeExpiredEndedTasks();
 
     assertEquals(QueryStatus.FAILED, service.getStatus(id),
         "failed task within retention -> getStatus should still return FAILED");
@@ -252,6 +252,6 @@ class QueryProcessingServiceTest {
   private static QueryProperties testQueryProperties() {
     return new QueryProperties(
         new QueryProperties.ExecutorProperties(3, 10, 100, "req-"),
-        new QueryProperties.TaskProperties(RETENTION, Duration.ofMinutes(15)));
+        new QueryProperties.TaskProperties(ENDED_RETENTION, Duration.ofMinutes(15)));
   }
 }

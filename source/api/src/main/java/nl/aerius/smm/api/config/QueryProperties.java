@@ -35,7 +35,7 @@ public record QueryProperties(
   ) {}
 
   public record TaskProperties(
-      Duration terminalRetention,
+      Duration endedRetention,
       Duration cleanupInterval
   ) {}
 }

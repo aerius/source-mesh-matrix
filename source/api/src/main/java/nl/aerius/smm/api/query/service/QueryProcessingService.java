@@ -37,8 +37,8 @@ import nl.aerius.smm.api.config.QueryProperties;
 import nl.aerius.smm.api.exception.QueueFullException;
 import nl.aerius.smm.api.exception.ResultNotReadyException;
 import nl.aerius.smm.api.exception.TaskNotFoundException;
-import nl.aerius.smm.api.matrix.service.MatrixService;
 import nl.aerius.smm.api.matrix.model.MatrixCell;
+import nl.aerius.smm.api.matrix.service.MatrixService;
 import nl.aerius.smm.api.query.model.QueryRequest;
 import nl.aerius.smm.api.query.model.QueryResultResponse;
 import nl.aerius.smm.api.query.model.QueryStatus;
@@ -52,7 +52,7 @@ public class QueryProcessingService {
   private final Executor requestExecutor;
   private final MatrixService matrixService;
   private final Clock clock;
-  private final Duration terminalRetention;
+  private final Duration endedRetention;
 
   public QueryProcessingService(
       @Qualifier("requestExecutor") final Executor requestExecutor,
@@ -62,7 +62,7 @@ public class QueryProcessingService {
     this.requestExecutor = requestExecutor;
     this.matrixService = matrixService;
     this.clock = clock;
-    this.terminalRetention = queryProperties.taskProperties().terminalRetention();
+    this.endedRetention = queryProperties.taskProperties().endedRetention();
   }
 
   public String create(final QueryRequest request) {
@@ -110,16 +110,16 @@ public class QueryProcessingService {
     return new QueryResultResponse(popped.get().request(), popped.get().results());
   }
 
-  /** Removes terminal tasks whose {@link QueryTask#endedAt()} is older than the configured retention. */
-  public void purgeExpiredTerminalTasks() {
-    final Instant cutoff = clock.instant().minus(terminalRetention);
-    final int removed = purgeTasksOlderThan(cutoff);
+  /** Removes ended tasks whose {@link QueryTask#endedAt()} is older than the configured retention. */
+  public void purgeExpiredEndedTasks() {
+    final Instant cutoff = clock.instant().minus(endedRetention);
+    final int removed = purgeEndedTasksOlderThan(cutoff);
     if (removed > 0) {
-      LOG.debug("Purged {} expired terminal task(s) (cutoff={})", removed, cutoff);
+      LOG.debug("Purged {} ended task(s) past retention (cutoff={})", removed, cutoff);
     }
   }
 
-  private int purgeTasksOlderThan(final Instant cutoff) {
+  private int purgeEndedTasksOlderThan(final Instant cutoff) {
     int removed = 0;
     for (final Map.Entry<String, QueryTask> entry : tasks.entrySet()) {
       final QueryTask task = entry.getValue();
@@ -135,8 +135,8 @@ public class QueryProcessingService {
     updateTaskInQueue(task.id(), QueryTask::processing);
 
     try {
-      final List<MatrixCell> result = matrixService.fetchMatrixResults(task.request());
-      updateTaskInQueue(task.id(), current -> current.complete(result, clock.instant()));
+      final List<MatrixCell> results = matrixService.fetchMatrixResults(task.request());
+      updateTaskInQueue(task.id(), current -> current.complete(results, clock.instant()));
     } catch (final Exception e) {
       LOG.error("Async task failed while computing result: taskId={}", task.id(), e);
       updateTaskInQueue(task.id(), current -> current.failed(clock.instant()));

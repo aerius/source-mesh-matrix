@@ -56,8 +56,8 @@ public record QueryTask(
   }
 
   /** Task COMPLETED */
-  public QueryTask complete(final List<MatrixCell> result, final Instant endedAt) {
-    return new QueryTask(id, request, QueryStatus.COMPLETED, result, endedAt);
+  public QueryTask complete(final List<MatrixCell> results, final Instant endedAt) {
+    return new QueryTask(id, request, QueryStatus.COMPLETED, results, endedAt);
   }
 
   /** Task FAILED during processing */

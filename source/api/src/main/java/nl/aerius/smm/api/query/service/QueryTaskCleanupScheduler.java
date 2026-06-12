@@ -30,6 +30,6 @@ public class QueryTaskCleanupScheduler {
 
   @Scheduled(fixedDelayString = "${aerius.query.task.cleanup-interval}")
   void cleanup() {
-    queryProcessingService.purgeExpiredTerminalTasks();
+    queryProcessingService.purgeExpiredEndedTasks();
   }
 }
