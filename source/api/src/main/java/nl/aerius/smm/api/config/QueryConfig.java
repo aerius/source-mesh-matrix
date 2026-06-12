@@ -35,7 +35,7 @@ public class QueryConfig {
 
   @Bean
   public Executor requestExecutor(final QueryProperties queryProperties) {
-    final QueryProperties.ExecutorProperties properties = queryProperties.executor();
+    final QueryProperties.ExecutorProperties properties = queryProperties.executorProperties();
     final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     executor.setCorePoolSize(properties.corePoolSize());

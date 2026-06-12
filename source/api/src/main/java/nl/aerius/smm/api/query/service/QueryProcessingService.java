@@ -62,7 +62,7 @@ public class QueryProcessingService {
     this.requestExecutor = requestExecutor;
     this.matrixService = matrixService;
     this.clock = clock;
-    this.terminalRetention = queryProperties.task().terminalRetention();
+    this.terminalRetention = queryProperties.taskProperties().terminalRetention();
   }
 
   public String create(final QueryRequest request) {

@@ -19,11 +19,12 @@ package nl.aerius.smm.api.config;
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.Name;
 
 @ConfigurationProperties(prefix = "aerius.query")
 public record QueryProperties(
-    ExecutorProperties executor,
-    TaskProperties task
+    @Name("executor") ExecutorProperties executorProperties,
+    @Name("task") TaskProperties taskProperties
 ) {
 
   public record ExecutorProperties(
