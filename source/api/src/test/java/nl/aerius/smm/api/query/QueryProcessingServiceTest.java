@@ -120,11 +120,11 @@ class QueryProcessingServiceTest {
 
     final String id = service.create(sampleRequest());
 
-    final ResultNotReadyException notReady = assertThrows(
+    final ResultNotReadyException exception = assertThrows(
         ResultNotReadyException.class,
         () -> service.getResult(id),
         "getResult before async work -> should throw ResultNotReadyException");
-    assertEquals(QueryStatus.ACCEPTED, notReady.getStatus(),
+    assertEquals(QueryStatus.ACCEPTED, exception.getStatus(),
         "ResultNotReadyException -> should expose current task status ACCEPTED");
 
     when(matrixService.fetchMatrixResults(any())).thenReturn(List.of(sampleRecord()));
@@ -140,11 +140,12 @@ class QueryProcessingServiceTest {
     };
     service = new QueryProcessingService(rejecting, matrixService, clock, testQueryProperties());
 
-    final QueueFullException qf = assertThrows(
+    final QueryRequest request = sampleRequest();
+    final QueueFullException exception = assertThrows(
         QueueFullException.class,
-        () -> service.create(sampleRequest()),
+        () -> service.create(request),
         "executor rejects submission -> create should throw QueueFullException");
-    final String taskId = qf.getTaskId();
+    final String taskId = exception.getTaskId();
     assertEquals(QueryStatus.REJECTED, service.getStatus(taskId),
         "queue full -> task should remain REJECTED in queue");
   }
@@ -164,7 +165,8 @@ class QueryProcessingServiceTest {
     when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
 
     final String id = service.create(sampleRequest());
-    assertEquals(QueryStatus.FAILED, service.getStatus(id));
+    assertEquals(QueryStatus.FAILED, service.getStatus(id),
+        "matrixService.fetchMatrixResults throws -> task should end FAILED before purge");
 
     clock.advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
@@ -180,8 +182,12 @@ class QueryProcessingServiceTest {
     };
     service = new QueryProcessingService(rejecting, matrixService, clock, testQueryProperties());
 
-    final QueueFullException qf = assertThrows(QueueFullException.class, () -> service.create(sampleRequest()));
-    final String taskId = qf.getTaskId();
+    final QueryRequest request = sampleRequest();
+    final QueueFullException exception = assertThrows(
+        QueueFullException.class,
+        () -> service.create(request),
+        "executor rejects submission -> create should throw QueueFullException");
+    final String taskId = exception.getTaskId();
 
     clock.advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
@@ -195,7 +201,8 @@ class QueryProcessingServiceTest {
     when(matrixService.fetchMatrixResults(any())).thenReturn(List.of(sampleRecord()));
 
     final String id = service.create(sampleRequest());
-    assertEquals(QueryStatus.COMPLETED, service.getStatus(id));
+    assertEquals(QueryStatus.COMPLETED, service.getStatus(id),
+        "completed task -> getStatus should return COMPLETED before purge");
 
     clock.advance(RETENTION.plusSeconds(1));
     service.purgeExpiredTerminalTasks();
@@ -209,7 +216,8 @@ class QueryProcessingServiceTest {
     when(matrixService.fetchMatrixResults(any())).thenThrow(new IllegalStateException("matrix error"));
 
     final String id = service.create(sampleRequest());
-    assertEquals(QueryStatus.FAILED, service.getStatus(id));
+    assertEquals(QueryStatus.FAILED, service.getStatus(id),
+        "failed task -> getStatus should return FAILED before retention expires");
 
     clock.advance(RETENTION.minusSeconds(1));
     service.purgeExpiredTerminalTasks();
