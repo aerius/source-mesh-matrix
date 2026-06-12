@@ -26,7 +26,7 @@ cicdPipeline(
   }
 
   cicdStage('All tests') {
-    docker.image(DOCKER_CLICKHOUSE_IMAGE``)
+    docker.image(DOCKER_CLICKHOUSE_IMAGE)
         .withRun('-P') { c ->
 
       // Get random port from the database container
