@@ -1,5 +1,5 @@
 <!--
-  Copyright Dutch Ministry of Economic Affairs
+  Copyright (c) Contributors to the project
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,13 @@
       <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
     </license>
   </licenses>
+
+  <contributors>
+    <contributor>
+      <organization>Ministry of Agriculture, Fisheries, Food Security and Nature</organization>
+      <organizationUrl>https://www.government.nl/ministries/ministry-of-agriculture-fisheries-food-security-and-nature</organizationUrl>
+    </contributor>
+  </contributors>
 
   <repositories>
     <repository>
