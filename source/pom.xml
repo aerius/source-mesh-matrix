@@ -33,11 +33,6 @@
   <description>The source-mesh-matrix project</description>
   <url>https://link.aerius.nl/website</url>
 
-  <organization>
-    <name>Ministry of Agriculture, Fisheries, Food Security and Nature</name>
-    <url>https://www.government.nl/ministries/ministry-of-agriculture-fisheries-food-security-and-nature</url>
-  </organization>
-
   <licenses>
     <license>
       <name>GNU Affero General Public License</name>
