@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1
-FROM debian:bullseye
+FROM debian:bookworm
 
 # Install wget
 RUN --mount=type=cache,id=aerius-apt-cache-debian,mode=0755,sharing=locked,target=/var/cache/apt \
